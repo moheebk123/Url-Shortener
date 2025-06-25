@@ -1,0 +1,13 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "description": "URL Shortener using Node.js with file storage",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --watch app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "Moheeb Khan",
+  "license": "ISC"
+}

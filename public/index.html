@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+    <title>URL Shortener</title>
+</head>
+<body>
+  <div id="main">
+    <form class="input-box" action="">
+      <h2>URL Shortener</h2>
+      <div class="box">
+        <h4>Enter URL:</h4>
+        <input type="url" name="url" class="url" required>
+      </div>
+      <div class="box">
+        <h4>Custom Short URL (Optional):</h4>
+        <input type="text" name="custom-url" class="custom-url">
+      </div>
+      <button type="submit">Short</button>
+    </form>
+    <h2>Shortened URLs</h2>
+    <div class="url-box">
+    </div>
+  </div>
+
+    <script src="./index.js"></script>
+</body>
+</html>
