@@ -5,12 +5,15 @@ import {
   getUserById,
   updateRefreshToken,
   getUserWithLinks,
+  updateVerification,
 } from "../services/user.services.js";
 import {
   hashPassword,
   generateToken,
   isPasswordCorrect,
+  generateVerifyCode,
 } from "../services/auth.services.js";
+import { sendVerificationCode } from "../services/email.services.js";
 
 const handleRegister = async (req, res) => {
   try {
@@ -41,6 +44,7 @@ const handleRegister = async (req, res) => {
       password: hashedPassword,
       refreshToken: "",
       isVerified: false,
+      verificationCode: ""
     });
     if (user) {
       const accessToken = generateToken(
@@ -78,7 +82,7 @@ const handleRegister = async (req, res) => {
           secure: false, // true in production
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
-        .redirect("/profile");
+        .redirect("/verify-email");
     }
   } catch (error) {
     console.log(error);
@@ -179,6 +183,59 @@ const handleLogout = async (req, res) => {
   }
 };
 
+const handleResendVerificationLink = async (req, res) => {
+  const { user } = req;
+  if (!user) {
+    req.flash(
+      "errors",
+      "You are not authenticated to access resend verify email page"
+    );
+    return res.redirect("/login");
+  }
+
+  const loggedUser = await getUserById(user.id);
+  if (loggedUser && loggedUser.isVerified) {
+    req.flash("errors", "You have already been verified your email");
+    return res.redirect("/profile");
+  }
+
+  const verificationCode = generateVerifyCode();
+  await updateVerification(loggedUser._id, verificationCode);
+  req.flash("successes", "Verification code sent successfully");
+  return res.redirect("/verify-email");
+};
+
+const handleVerifyEmail = async (req, res) => {
+  const { user, query } = req;
+  console.log(query)
+  if (!user) {
+    req.flash(
+      "errors",
+      "You are not authenticated to access resend verify email page"
+    );
+    return res.redirect("/login");
+  }
+
+  const loggedUser = await getUserById(user.id);
+  if (loggedUser && loggedUser.isVerified) {
+    req.flash("errors", "You have already been verified your email");
+    return res.redirect("/profile");
+  }
+
+  const verificationCode = req.body.verifyCode;
+  if (verificationCode === loggedUser.verificationCode) {
+    await updateVerification(loggedUser._id, "", true)
+
+    req.flash("successes", "Email verified successfully");
+    return res.redirect("/profile");
+  }
+  req.flash(
+    "errors",
+    "Invalid verification code"
+  );
+  res.redirect("/verify-email");
+};
+
 const handleRegisterPage = (req, res) => {
   return res.render("register", { errors: req.flash("errors") });
 };
@@ -216,11 +273,77 @@ const handleProfilePage = async (req, res) => {
   }
 };
 
+const handleVerifyEmailPage = async (req, res) => {
+  const { user } = req;
+  if (!user) {
+    req.flash(
+      "errors",
+      "You are not authenticated to access verify email page"
+    );
+    return res.redirect("/login");
+  }
+
+  const loggedUser = await getUserById(user.id);
+  if (loggedUser && loggedUser.isVerified) {
+    req.flash("errors", "You have already been verified your email");
+    return res.redirect("/profile");
+  }
+
+  if (loggedUser && loggedUser.verificationCode.length === 0) {
+    try {
+      const verificationCode = generateVerifyCode();
+      await updateVerification(loggedUser._id, verificationCode);
+
+      const success = await sendVerificationCode(
+        loggedUser.email,
+        verificationCode
+      )
+
+      if (success) {
+        req.flash("successes", "Verification code sent successfully");
+        return res.render("verifyEmail", {
+          errors: req.flash("errors"),
+          successes: req.flash("successes"),
+        });
+      } else {
+        req.flash(
+          "errors",
+          "Failed to send verification code. Click resend button"
+        );
+        return res.render("verifyEmail", {
+          errors: req.flash("errors"),
+          successes: req.flash("successes"),
+        });
+      }
+
+    } catch (error) {
+      console.log(error);
+
+      req.flash(
+        "errors",
+        "Failed to send verification code. Click resend button"
+      );
+      return res.render("verifyEmail", {
+        errors: req.flash("errors"),
+        successes: req.flash("success"),
+      });
+    }
+  }
+
+  return res.render("verifyEmail", {
+    errors: req.flash("errors"),
+    successes: req.flash("successes"),
+  });
+};
+
 export {
   handleRegister,
   handleLogin,
   handleLogout,
+  handleResendVerificationLink,
+  handleVerifyEmail,
   handleRegisterPage,
   handleLoginPage,
   handleProfilePage,
+  handleVerifyEmailPage,
 };
