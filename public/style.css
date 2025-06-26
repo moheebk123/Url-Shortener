@@ -304,7 +304,7 @@ button {
   gap: 1em;
   align-items: center;
   width: 100%;
-  border-top: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
 
   & > div.avatar {
     display: none;
@@ -312,10 +312,6 @@ button {
     @media screen and (min-width: 600px) {
       display: grid;
     }
-  }
-
-  &:nth-child(1) {
-    border-top: 0;
   }
 
   &:hover {
@@ -625,5 +621,51 @@ p {
       width: 40px;
       height: 40px;
     }
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 1em;
+  font-weight: bold;
+
+  & > a {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    text-decoration: none;
+    color: #2370eb;
+    border: 1px solid #2370eb;
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
+    -webkit-transition: background-color 0.2s ease-in-out;
+    -moz-transition: background-color 0.2s ease-in-out;
+    -ms-transition: background-color 0.2s ease-in-out;
+    -o-transition: background-color 0.2s ease-in-out;
+
+    &:hover {
+      background-color: #2370eb;
+      color: white;
+    }
+
+    & > span {
+      display: none;
+
+      @media screen and (min-width: 768px) {
+        display: block;
+      }
+    }
+  }
+
+  & > .current {
+    padding: 6px 12px;
+    background-color: #2370eb;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
   }
 }

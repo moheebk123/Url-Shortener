@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   handleRoot,
   handleAbout,
+  handleAllLinks,
   addShortenedUrl,
   redirectToUrl,
   handleDeleteUrlShortener,
@@ -14,6 +15,8 @@ const router = Router();
 router.get("/", handleRoot);
 
 router.get("/about", handleAbout);
+
+router.get("/links", handleAllLinks);
 
 router.post("/", addShortenedUrl);
 

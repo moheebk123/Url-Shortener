@@ -2,6 +2,7 @@ import crypto from "crypto";
 import {
   addLink,
   loadLinks,
+  loadHomeLinks,
   getLink,
   getLinkById,
   updateLink,
@@ -12,7 +13,7 @@ import { getUserById, pushShortenedUrl } from "../services/user.services.js";
 export const handleRoot = async (req, res) => {
   try {
     let isVerified = false;
-    const links = await loadLinks();
+    const links = await loadHomeLinks();
     const { user } = req;
     if (user) {
       const loggedUser = await getUserById(user.id);
@@ -39,6 +40,45 @@ export const handleRoot = async (req, res) => {
 
 export const handleAbout = (_, res) => {
   return res.render("about");
+};
+
+export const handleAllLinks = async (req, res) => {
+  const page = Number(req.query.page);
+  if (!page || page <= 0) {
+    return res.redirect("/links?page=1");
+  }
+
+  try {
+    // total no. of urls - ✅
+    // total no. of pages - ✅
+    // current page - ✅
+    // limit per page - ✅
+    // offset - how many documents/items to skip - ✅
+    // start page - ✅
+    // end page  - ✅
+    const { links, totalLinks } = await loadLinks({
+      limit: 10,
+      skip: (page - 1) * 10,
+    });
+
+    const totalPages = Math.ceil(totalLinks / 10);
+    const startPage = Math.max(1, page - 1)
+    const endPage = Math.min(totalPages, page + 1)
+
+    return res.render("links", {
+      links,
+      host: req.host,
+      totalPages,
+      startPage,
+      endPage,
+      currentPage: page,
+    });
+  } catch (error) {
+    console.log(error);
+
+    req.flash("errors", "Internal Server Error");
+    return res.redirect("/links");
+  }
 };
 
 export const addShortenedUrl = async (req, res) => {

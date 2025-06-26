@@ -1,7 +1,7 @@
 {
   "name": "url-shortener",
   "version": "1.0.0",
-  "description": "URL Shortener using Node.js, Express.js and MongoDB with OAUTH LOGIN",
+  "description": "URL Shortener using Node.js, Express.js and MongoDB with Pagination",
   "main": "app.js",
   "type": "module",
   "scripts": {
