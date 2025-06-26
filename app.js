@@ -1,5 +1,5 @@
 import express from "express";
-import { PORT } from "./zod.js";
+import { env } from ".//config/env.config.js";
 import path from "path";
 import { shortenedUrlRoutes } from "./routes/shortenedUrlRoutes.routes.js";
 
@@ -18,6 +18,6 @@ app.use((req, res) => {
   return res.status(404).sendFile(path.join(import.meta.dirname, "views", "error.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+app.listen(env.PORT, () => {
+  console.log(`Server listening on http://localhost:${env.PORT}`);
 });
