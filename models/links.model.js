@@ -3,21 +3,39 @@ import mongoose from "mongoose";
 const urlShortener = mongoose.Schema(
   {
     url: { type: String },
-    shortCode: { type: String }
+    shortCode: { type: String },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
   { timestamps: true }
 );
 
-const UrlShortener = mongoose.model("url_shortener", urlShortener)
+const UrlShortener = mongoose.model("url_shortener", urlShortener);
 
 export const loadLinks = async () => {
-  return await UrlShortener.find();
+  const links = await UrlShortener.find().populate("createdBy");
+  links.map(link => link.createdBy = { ...link.createdBy, email: "", password: "" })
+  return links;
 };
 
 export const addLink = async (link) => {
-  await UrlShortener.create(link);
+  return await UrlShortener.create(link);
 };
 
 export const getLink = async (shortCode) => {
   return await UrlShortener.findOne({ shortCode });
 };
+
+export const getLinkById = async (id) => {
+  return await UrlShortener.findById(id);
+};
+
+export const updateLink = async (id, updatedShortUrl) => {
+  return await UrlShortener.findByIdAndUpdate(id, updatedShortUrl);
+}
+
+export const deleteLink = async (id) => {
+  return await UrlShortener.findByIdAndDelete(id);
+}

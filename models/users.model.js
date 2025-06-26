@@ -18,7 +18,13 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       unique: true,
-    }
+    },
+    shortenedUrls: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "url_shortener",
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -35,7 +41,7 @@ export const isPasswordCorrect = async (password, hashedPassword) => {
 
 export const generateToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "30d"
+    expiresIn: "1m"
   })
 };
 
@@ -50,3 +56,13 @@ export const createUser = async (newUser) => {
 export const getUser = async (email) => {
   return await User.findOne({ email });
 };
+
+export const getUserWithLinks = async (userId) => {
+  return await User.findById(userId).populate("shortenedUrls");
+};
+
+export const pushShortenedUrl = async (userId, newShortUrlId) => {
+  await User.findByIdAndUpdate(userId, {
+    $push: { shortenedUrls: newShortUrlId },
+  });
+}

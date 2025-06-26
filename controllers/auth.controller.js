@@ -2,13 +2,22 @@ import {
   createUser,
   generateToken,
   getUser,
+  getUserWithLinks,
   hashPassword,
   isPasswordCorrect,
 } from "../models/users.model.js";
+import {loginUserSchema, registerUserSchema} from "../config/auth.config.js"
 
 const handleRegister = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { data, error } = registerUserSchema.safeParse(req.body)
+    if (error) {
+      const errors = error.errors[0].message;
+      req.flash("errors", errors);
+      return res.redirect("/register")
+    }
+
+    const { name, email, password } = data;
     if ((!name || !email, !password)) {
       req.flash("errors", "All fields are required.");
       return res.redirect("/register");
@@ -35,7 +44,14 @@ const handleRegister = async (req, res) => {
 
 const handleLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { data, error } = loginUserSchema.safeParse(req.body);
+    if (error) {
+      const errors = error.errors[0].message;
+      req.flash("errors", errors);
+      return res.redirect("/login");
+    }
+
+    const { email, password } = data;
     if ((!email, !password)) {
       req.flash("errors", "All fields are required.");
       return res.redirect("/login");
@@ -51,7 +67,6 @@ const handleLogin = async (req, res) => {
       password,
       existedUser.password
     );
-
     if (!isPasswordValid) {
       req.flash("errors", "Invalid user credentials.");
       return res.redirect("/login");
@@ -96,21 +111,24 @@ const handleLoginPage = (req, res) => {
   });
 };
 
-const handleProfilePage = (req, res) => {
+const handleProfilePage = async (req, res) => {
   const { user } = req;
   if (!user) {
     req.flash("errors", "You are not authenticated to access profile page");
     return res.redirect("/login");
   }
 
-  return res.render(
-    "profile",
-    {
+  const userProfile = await getUserWithLinks(user.id)
+  if (userProfile) {
+    return res.render("profile", {
       name: req.user.name,
       email: req.user.email,
+      host: req.host,
+      links: userProfile.shortenedUrls,
       successes: req.flash("successes"),
-    }
-  );
+      errors: req.flash("errors"),
+    });
+  }
 };
 
 export {

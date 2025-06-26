@@ -1,6 +1,6 @@
 import { verifyToken } from "../models/users.model.js";
 
-export const verifyAuthentication = async (req, res, next) => {
+export const verifyAuthentication = async (req, _, next) => {
   try {
     const { access_token } = req.cookies
     if (!access_token) {
@@ -11,7 +11,6 @@ export const verifyAuthentication = async (req, res, next) => {
 
     const decodedToken = verifyToken(access_token)
     req.user = decodedToken;
-    console.log(req.user)
 
     return next();
   } catch (error) {

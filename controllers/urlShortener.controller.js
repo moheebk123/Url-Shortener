@@ -1,12 +1,21 @@
 import path from "path";
 import crypto from "crypto";
-import { addLink, loadLinks, getLink } from "../models/links.model.js";
+import {
+  addLink,
+  loadLinks,
+  getLink,
+  getLinkById,
+  updateLink,
+  deleteLink,
+} from "../models/links.model.js";
+import { pushShortenedUrl } from "../models/users.model.js";
 
 const viewFolderPath = path.join(path.dirname(import.meta.dirname), "views");
 
 export const handleRoot = async (req, res) => {
   try {
     const links = await loadLinks();
+    console.log(links[0]._id);
 
     return res.render("index", {
       links,
@@ -28,25 +37,37 @@ export const handleAbout = (_, res) => {
 
 export const addShortenedUrl = async (req, res) => {
   try {
-    const { url, shortCode } = req.body;
+    const { user, body } = req;
 
-    if (!url) {
-      req.flash("errors", "URL is required.");
+    if (user) {
+      const { url, shortCode } = body;
+
+      if (!url) {
+        req.flash("errors", "URL is required.");
+        return res.redirect("/");
+      }
+
+      const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
+      const link = await getLink(finalShortCode);
+
+      if (link) {
+        req.flash("errors", "Short code already exist.");
+        return res.redirect("/");
+      }
+
+      const newShortUrl = await addLink({
+        shortCode: finalShortCode,
+        url,
+        createdBy: user.id,
+      });
+
+      if (newShortUrl) {
+        await pushShortenedUrl(user.id, newShortUrl._id);
+      }
+
+      req.flash("successes", "Short code added successfully.");
       return res.redirect("/");
     }
-
-    const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
-    const link = await getLink(finalShortCode);
-
-    if (link) {
-      req.flash("errors", "Short code already exist.");
-      return res.redirect("/");
-    }
-
-    await addLink({ shortCode: finalShortCode, url });
-    
-    req.flash("successes", "Short code added successfully.");
-    return res.redirect("/");
   } catch (error) {
     console.log(error);
 
@@ -69,5 +90,117 @@ export const redirectToUrl = async (req, res) => {
 
     req.flash("errors", "Internal Server Error");
     return res.redirect("/");
+  }
+};
+
+export const handleEditPage = async (req, res) => {
+  try {
+    const { user } = req;
+    if (!user) {
+      req.flash("errors", "You are not authenticated to access edit page");
+      return res.redirect("/profile");
+    }
+
+    const { id } = req.params;
+    const shortenedUrl = await getLinkById(id);
+
+    if (shortenedUrl && user.id === shortenedUrl.createdBy.toString()) {
+      return res.render("edit", {
+        shortenedUrl,
+        errors: req.flash("errors"),
+        successes: req.flash("successes"),
+      });
+    } else {
+      req.flash(
+        "errors",
+        "You are not authenticated to edit this shortened url"
+      );
+      return res.redirect("/profile");
+    }
+  } catch (error) {
+    console.log(error);
+
+    req.flash("errors", "Internal Server Error");
+    return res.redirect("/profile");
+  }
+};
+
+export const handleEdit = async (req, res) => {
+  try {
+    const { user } = req;
+    if (!user) {
+      req.flash("errors", "You are not authenticated to access edit page");
+      return res.redirect("/profile");
+    }
+
+    const { id } = req.params;
+    const shortenedUrl = await getLinkById(id);
+
+    if (shortenedUrl && user.id === shortenedUrl.createdBy.toString()) {
+      const { url, shortCode } = req.body;
+
+      if (!url) {
+        req.flash(
+          "errors",
+          "Url is required."
+        );
+        return res.redirect(req.url);
+      }
+
+      const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
+
+      const updatedShortUrl = await updateLink(shortenedUrl._id, {url, shortCode: finalShortCode})
+
+      if (updatedShortUrl) {
+        req.flash(
+          "successes",
+          "Shortened Url updated successfully"
+        );
+        return res.redirect("/profile");
+      }
+    } else {
+      req.flash(
+        "errors",
+        "You are not authenticated to edit this shortened url"
+      );
+    }
+  } catch (error) {
+    console.log(error);
+
+    req.flash("errors", "Internal Server Error");
+    return res.redirect(req.url);
+  }
+};
+
+export const handleDelete = async (req, res) => {
+  try {
+    const { user } = req;
+    if (!user) {
+      req.flash("errors", "You are not authenticated to access edit page");
+      return res.redirect("/profile");
+    }
+
+    const { id } = req.params;
+    const shortenedUrl = await getLinkById(id);
+
+    if (shortenedUrl && user.id === shortenedUrl.createdBy.toString()) {
+      const deletedShortUrl = await deleteLink(shortenedUrl._id);
+      if (deletedShortUrl) {
+        req.flash("successes", "Shortened Url deleted successfully");
+        return res.redirect("/profile");
+      }
+    } else {
+      req.flash(
+        "errors",
+        "You are not authenticated to delete this shortened url"
+      );
+    }
+
+  } catch (error) {
+    console.log(error);
+
+    req.flash("errors", "Internal Server Error");
+    return res.redirect("/profile");
+
   }
 };
