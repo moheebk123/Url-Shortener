@@ -117,6 +117,17 @@ button {
   -ms-border-radius: 5px;
   -o-border-radius: 5px;
 
+  &.resend-link {
+    background-color: #888;
+    width: fit-content;
+    right: 0;
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
+    -ms-transform: translateX(0);
+    -o-transform: translateX(0);
+}
+
   &:is(.logout, .verify) {
     border-radius: 50px;
     -webkit-border-radius: 50px;
@@ -375,5 +386,9 @@ p {
   width: 100%;
   max-width: 700px;
   font-weight: 600;
+  font-size: 1.2em;
+}
+
+.box > strong {
   font-size: 1.2em;
 }

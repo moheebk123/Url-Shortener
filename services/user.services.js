@@ -27,3 +27,9 @@ export const updateRefreshToken = async (userId, refreshToken = "") => {
     $set: { refreshToken },
   });
 };
+
+export const updateVerification = async (userId, verificationCode, isVerified=false) => {
+  await User.findByIdAndUpdate(userId, {
+    $set: { verificationCode, isVerified },
+  });
+};
