@@ -1,9 +1,16 @@
 import { Router } from "express";
-import { addShortenedUrl, handleRoot, redirectToUrl } from "../controllers/urlShortener.controller.js";
+import {
+  handleRoot,
+  handleAbout,
+  addShortenedUrl,
+  redirectToUrl,
+} from "../controllers/urlShortener.controller.js";
 
 const router = Router();
 
 router.get("/", handleRoot);
+
+router.get("/about", handleAbout);
 
 router.post("/", addShortenedUrl);
 
