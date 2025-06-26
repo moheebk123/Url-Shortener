@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+    <title>URL Shortener</title>
+</head>
+<body>
+  <div id="main">
+    <form class="input-box" action="/" method="post">
+      <h2>URL Shortener</h2>
+      <div class="box">
+        <h4>Enter URL:</h4>
+        <input type="url" name="url" class="url" required>
+      </div>
+      <div class="box">
+        <h4>Custom Short URL (Optional):</h4>
+        <input type="text" name="shortCode" class="custom-url">
+      </div>
+      <button type="submit">Short</button>
+    </form>
+    <h2>Shortened URLs</h2>
+    <div class="url-box">
+      <!-- {{shortened_urls}} -->
+          <!-- Object.entries(links)
+        .map(([shortCode, url]) => {
+          const truncatedUrl =
+            url.length >= 30 ? `${url.slice(0, 30)}...` : url;
+          return `<div class="shorten-url">
+          <a href="/${shortCode}" target="_blank" rel="noopener noreferrer">${req.host}/${shortCode}</a>
+          <br/>
+          <div>${truncatedUrl}</div>
+        </div>`;
+        })
+        .join("") -->
+        <%Object.entries(links).map(([shortCode, url]) => {%>
+          <% const truncatedUrl = url.length >= 30 ? `${url.slice(0, 30)}...` : url; %>
+          <div class="shorten-url">
+          <a href="/<%= shortCode %>" target="_blank" rel="noopener noreferrer"><%= host + "/" + shortCode %></a>
+          <br/>
+          <div><%= truncatedUrl %></div>
+        </div>
+        <% }) %>
+    </div>
+  </div>
+
+    <!-- <script src="./index.js"></script> -->
+</body>
+</html>

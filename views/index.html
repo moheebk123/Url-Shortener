@@ -8,7 +8,7 @@
 </head>
 <body>
   <div id="main">
-    <form class="input-box" action="">
+    <form class="input-box" action="/" method="post">
       <h2>URL Shortener</h2>
       <div class="box">
         <h4>Enter URL:</h4>
@@ -16,15 +16,16 @@
       </div>
       <div class="box">
         <h4>Custom Short URL (Optional):</h4>
-        <input type="text" name="custom-url" class="custom-url">
+        <input type="text" name="shortCode" class="custom-url">
       </div>
       <button type="submit">Short</button>
     </form>
     <h2>Shortened URLs</h2>
     <div class="url-box">
+      {{shortened_urls}}
     </div>
   </div>
 
-    <script src="./index.js"></script>
+    <!-- <script src="./index.js"></script> -->
 </body>
 </html>
