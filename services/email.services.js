@@ -2,7 +2,7 @@ import {
   RESET_PASSWORD_EMAIL_TEMPLATE,
   VERIFICATION_EMAIL_TEMPLATE
 } from "../templates/email.template.js";
-import { transporter } from "../utils/nodemailer.utils.js";
+import { transporter } from "../utils/email/nodemailer.utils.js";
 
 export const sendVerificationCode = async (email, verificationCode) => {
   try {

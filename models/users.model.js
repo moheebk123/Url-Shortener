@@ -14,8 +14,12 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      unique: true,
+      default: undefined,
+      maxLength: 30,
+    },
+    avatar: {
+      type: String,
+      default: "",
     },
     refreshToken: String,
     resetPasswordToken: String,
@@ -30,6 +34,10 @@ const userSchema = mongoose.Schema(
         ref: "url_shortener",
       },
     ],
+    oauthUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "oauth_user",
+    },
   },
   { timestamps: true }
 );

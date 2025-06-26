@@ -4,6 +4,7 @@ import {
   handleLoginPage,
   handleProfilePage,
   handleEditProfilePage,
+  handleSetPasswordPage,
   handleChangePasswordPage,
   handleResetPasswordPage,
   handleForgetPasswordPage,
@@ -15,9 +16,12 @@ import {
   handleResendVerificationLink,
   handleVerifyEmail,
   handleDeleteAccount,
+  handleSetPassword,
   handleChangePassword,
   handleResetPassword,
   handleForgetPassword,
+  handleOAuthRedirect,
+  handleOAuthCallback,
 } from "../controllers/auth.controller.js";
 
 const router = Router();
@@ -40,6 +44,11 @@ router
   .post(handleEditProfile);
 
 router
+  .route("/set-password")
+  .get(handleSetPasswordPage)
+  .post(handleSetPassword);
+
+router
   .route("/change-password")
   .get(handleChangePasswordPage)
   .post(handleChangePassword);
@@ -57,5 +66,9 @@ router
 router.route("/logout").get(handleLogout);
 
 router.route("/delete-account").post(handleDeleteAccount);
+
+router.route("/oauth/:provider").get(handleOAuthRedirect)
+
+router.route("/oauth-redirect/:provider/callback").get(handleOAuthCallback);
 
 export const authRoutes = router;

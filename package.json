@@ -1,7 +1,7 @@
 {
   "name": "url-shortener",
   "version": "1.0.0",
-  "description": "URL Shortener using Node.js, Express.js and MongoDB with Change & Reset Password",
+  "description": "URL Shortener using Node.js, Express.js and MongoDB with OAUTH LOGIN",
   "main": "app.js",
   "type": "module",
   "scripts": {
@@ -11,6 +11,7 @@
   "author": "Moheeb Khan",
   "license": "ISC",
   "dependencies": {
+    "arctic": "^3.7.0",
     "argon2": "^0.43.0",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",

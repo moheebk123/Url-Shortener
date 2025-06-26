@@ -20,6 +20,10 @@ export const getUserWithLinks = async (userId) => {
   return await User.findById(userId).populate("shortenedUrls");
 };
 
+export const getUserWithOAuthProvider = async (email) => {
+  return await User.findOne({email}).populate("oauthUser");
+};
+
 export const pushShortenedUrl = async (userId, newShortUrlId) => {
   await User.findByIdAndUpdate(userId, {
     $push: { shortenedUrls: newShortUrlId },

@@ -1,4 +1,3 @@
-import path from "path";
 import crypto from "crypto";
 import {
   addLink,
@@ -88,10 +87,9 @@ export const redirectToUrl = async (req, res) => {
     const { shortCode } = req.params;
     const link = await getLink(shortCode);
 
-    if (!link)
-      return res.render("error", {message: "Link Not Found"});
+    if (!link) return res.render("error", { message: "Link Not Found" });
 
-    return res.redirect(link.url);
+    return res.status(301).redirect(link.url);
   } catch (error) {
     console.log(error);
 

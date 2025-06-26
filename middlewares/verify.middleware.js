@@ -2,7 +2,7 @@ import {generateToken, verifyToken} from "../services/auth.services.js"
 import { getUserById } from "../services/user.services.js"
 
 export const verifyAuthentication = async (req, res, next) => {
-    const { access_token, refresh_token } = req.cookies;
+  const { access_token, refresh_token } = req.cookies;
     if (!access_token && !refresh_token) {
       req.user = null;
       return next();

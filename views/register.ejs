@@ -31,6 +31,14 @@
             required
           />
           <button>Register</button>
+          <div class="oauth-box">
+            <a href="/oauth/google">
+              <img src="/google.png" alt="Google Icon" class="google">
+            </a>
+            <a href="/oauth/github">
+              <img src="/github.png" alt="GitHub Icon" class="github">
+            </a>
+          </div>
           <h3>Already have an account <a href="/login">Login</a></h3>
           <% if (errors && errors.length > 0) { %> <% errors.forEach((error) =>
           { %>

@@ -599,3 +599,31 @@ p {
     }
   }
 }
+
+.oauth-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5em;
+  margin-block: 1em;
+
+  & > a > img {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding: 5px;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+
+    &.github {
+      height: 40px;
+      width: 40px;
+    }
+
+    &.google {
+      width: 40px;
+      height: 40px;
+    }
+  }
+}
