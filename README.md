@@ -133,7 +133,7 @@ A full-featured URL Shortener application built with **Node.js**, **Express**, a
 
 ---
 
-## 🛠️ Tech Stack
+## 🔒 Security Features
 
 - Unique short code generation
 - Session-based auth middleware
