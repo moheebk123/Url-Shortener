@@ -1,7 +1,7 @@
 {
   "name": "url-shortener",
   "version": "1.0.0",
-  "description": "URL Shortener using Node.js and Express.js with MongoDB",
+  "description": "URL Shortener using Node.js and Express.js with MongoDB ORM - Mongoose",
   "main": "app.js",
   "type": "module",
   "scripts": {
@@ -14,6 +14,7 @@
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "mongodb": "^6.16.0",
+    "mongoose": "^8.14.2",
     "zod": "^3.24.4"
   },
   "devDependencies": {
