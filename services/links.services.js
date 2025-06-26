@@ -1,29 +1,31 @@
 import { UrlShortener } from "../models/links.model.js";
 
-export const loadLinks = async ({limit = 10, skip = 0}) => {
-  const links = await UrlShortener.find()
-    .populate("createdBy")
-    .limit(limit)
-    .skip(skip)
-    .sort({ createdAt: -1 });
+export const loadLinks = async ({ limit = 10, skip = 0, createdBy }) => {
+  let links;
+  let totalLinks;
+  if (createdBy) {
+    links = await UrlShortener.find({ createdBy })
+      .populate("createdBy")
+      .limit(limit)
+      .skip(skip)
+      .sort({ createdAt: -1 });
 
-    const totalLinks = await UrlShortener.find().countDocuments();
+    totalLinks = await UrlShortener.find({ createdBy }).countDocuments();
+  } else {
+    links = await UrlShortener.find()
+      .populate("createdBy")
+      .limit(limit)
+      .skip(skip)
+      .sort({ createdAt: -1 });
+
+    totalLinks = await UrlShortener.find().countDocuments();
+  }
 
   links.map(
     (link) => (link.createdBy = { ...link.createdBy, email: "", password: "" })
   );
+
   return { links, totalLinks };
-};
-
-export const loadHomeLinks = async () => {
-  const links = await UrlShortener.find()
-    .populate("createdBy")
-    .limit(5)
-    .sort({ createdAt: -1 });
-  links.map(
-    (link) => (link.createdBy = { ...link.createdBy, email: "", password: "" })
-  );
-  return links;
 };
 
 export const addLink = async (link) => {
@@ -48,4 +50,4 @@ export const deleteLink = async (id) => {
 
 export const deleteUserLinks = async (createdBy) => {
   return await UrlShortener.deleteMany({ createdBy });
-}
+};

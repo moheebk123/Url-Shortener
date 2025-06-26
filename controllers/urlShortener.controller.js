@@ -2,7 +2,6 @@ import crypto from "crypto";
 import {
   addLink,
   loadLinks,
-  loadHomeLinks,
   getLink,
   getLinkById,
   updateLink,
@@ -13,7 +12,7 @@ import { getUserById, pushShortenedUrl } from "../services/user.services.js";
 export const handleRoot = async (req, res) => {
   try {
     let isVerified = false;
-    const links = await loadHomeLinks();
+    const { links } = await loadLinks({ limit: 5 });
     const { user } = req;
     if (user) {
       const loggedUser = await getUserById(user.id);
@@ -49,21 +48,18 @@ export const handleAllLinks = async (req, res) => {
   }
 
   try {
-    // total no. of urls - ✅
-    // total no. of pages - ✅
-    // current page - ✅
-    // limit per page - ✅
-    // offset - how many documents/items to skip - ✅
-    // start page - ✅
-    // end page  - ✅
     const { links, totalLinks } = await loadLinks({
       limit: 10,
       skip: (page - 1) * 10,
     });
 
     const totalPages = Math.ceil(totalLinks / 10);
-    const startPage = Math.max(1, page - 1)
-    const endPage = Math.min(totalPages, page + 1)
+    const startPage = Math.max(1, page - 1);
+    const endPage = Math.min(totalPages, page + 1);
+
+    if (page > totalPages) {
+      return res.redirect("/links?page=1");
+    }
 
     return res.render("links", {
       links,
@@ -77,7 +73,7 @@ export const handleAllLinks = async (req, res) => {
     console.log(error);
 
     req.flash("errors", "Internal Server Error");
-    return res.redirect("/links");
+    return res.redirect("/links?page=1");
   }
 };
 
@@ -175,7 +171,7 @@ export const handleEditUrlShortener = async (req, res) => {
     const { user } = req;
     if (!user) {
       req.flash("errors", "You are not authenticated to access edit page");
-      return res.redirect("/profile");
+      return res.redirect(`/user/${user.id}/links?page=1`);
     }
 
     const { id } = req.params;
@@ -198,13 +194,14 @@ export const handleEditUrlShortener = async (req, res) => {
 
       if (updatedShortUrl) {
         req.flash("successes", "Shortened Url updated successfully");
-        return res.redirect("/profile");
+        return res.redirect(`/user/${user.id}/links?page=1`);
       }
     } else {
       req.flash(
         "errors",
         "You are not authenticated to edit this shortened url"
       );
+      return res.redirect(`/user/${user.id}/links?page=1`);
     }
   } catch (error) {
     console.log(error);
@@ -218,8 +215,8 @@ export const handleDeleteUrlShortener = async (req, res) => {
   try {
     const { user } = req;
     if (!user) {
-      req.flash("errors", "You are not authenticated to access edit page");
-      return res.redirect("/profile");
+      req.flash("errors", "You are not authenticated to delete shortened url");
+      return res.redirect(`/user/${user.id}/links?page=1`);
     }
 
     const { id } = req.params;
@@ -229,18 +226,19 @@ export const handleDeleteUrlShortener = async (req, res) => {
       const deletedShortUrl = await deleteLink(shortenedUrl._id);
       if (deletedShortUrl) {
         req.flash("successes", "Shortened Url deleted successfully");
-        return res.redirect("/profile");
+        return res.redirect(`/user/${user.id}/links?page=1`);
       }
     } else {
       req.flash(
         "errors",
         "You are not authenticated to delete this shortened url"
       );
+      return res.redirect(`/user/${user.id}/links?page=1`);
     }
   } catch (error) {
     console.log(error);
 
     req.flash("errors", "Internal Server Error");
-    return res.redirect("/profile");
+    return res.redirect(`/user/${user.id}/links?page=1`);
   }
 };

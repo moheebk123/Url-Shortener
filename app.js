@@ -3,13 +3,21 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import flash from "connect-flash";
-import { env } from ".//config/env.config.js";
+import cors from "cors";
+import { env } from "./config/env.config.js";
 import { connectDB } from "./config/db-client.config.js";
 import { shortenedUrlRoutes } from "./routes/shortenedUrlRoutes.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { verifyAuthentication } from "./middlewares/verify.middleware.js";
 
 const app = express();
+
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
 
 const staticPath = path.join(import.meta.dirname, "public");
 app.use(express.static(staticPath));
@@ -44,7 +52,7 @@ app.use((_, res) => {
 
 try {
   await connectDB();
-  app.listen(env.PORT, () => {
+  app.listen(env.PORT, '0.0.0.0', () => {
     console.log(`Server listening on http://localhost:${env.PORT}`);
   });
 } catch (error) {

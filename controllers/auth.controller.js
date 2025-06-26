@@ -4,14 +4,13 @@ import {
   createUser,
   getUserByEmail,
   getUserById,
-  getUserWithLinks,
   getUserByResetPasswordToken,
   updateRefreshToken,
-  updateName,
   updatePassword,
   updateVerification,
   deleteUser,
   getUserWithOAuthProvider,
+  updateUserProfile,
 } from "../services/user.services.js";
 import {
   hashPassword,
@@ -24,7 +23,7 @@ import {
   sendResetPassword,
   sendVerificationCode,
 } from "../services/email.services.js";
-import { deleteUserLinks } from "../services/links.services.js";
+import { deleteUserLinks, loadLinks } from "../services/links.services.js";
 import {
   createOAuthUser,
   deleteOAuthUser,
@@ -32,6 +31,7 @@ import {
 } from "../services/oauthUsers.services.js";
 import { google } from "../utils/oauth/google.utils.js";
 import { github } from "../utils/oauth/github.utils.js";
+import uploadOnCloudinary from "../utils/cloud/cloudinary.utils.js";
 
 const handleRegister = async (req, res) => {
   try {
@@ -69,7 +69,6 @@ const handleRegister = async (req, res) => {
       oauthUser: oauthUser._id,
     });
     if (user) {
-      console.log(user);
       const accessToken = generateToken(
         {
           id: user.id,
@@ -151,6 +150,11 @@ const handleLogin = async (req, res) => {
       req.flash("errors", "Invalid user credentials.");
       return res.redirect("/login");
     }
+
+    await linkOAuthUser(existedUser.oauthUser, {
+      provider: "internal",
+      providerAccountId: "internal",
+    });
 
     const accessToken = generateToken(
       {
@@ -265,20 +269,33 @@ const handleVerifyEmail = async (req, res) => {
 };
 
 const handleEditProfile = async (req, res) => {
-  const { user, body } = req;
+  const { user, body, file } = req;
   if (!user) {
     req.flash("errors", "You are not authenticated to edit profile");
     return res.redirect("/login");
   }
+
   const newName = body.name;
   const oldName = user.name;
 
-  if (oldName === newName) {
+  if (oldName === newName && !file) {
     req.flash("errors", "Nothing to edit in profile");
     res.redirect("/edit-profile");
   }
 
-  const updatedUser = await updateName(user.id, newName);
+  let avatar = "";
+  if (req.file) {
+    const response = await uploadOnCloudinary(req.file.path);
+
+    if (!response) {
+      req.flash("errors", "Failed to upload avatar image. Try again");
+      res.redirect("/edit-profile");
+    }
+
+    avatar = response.url;
+  }
+
+  const updatedUser = await updateUserProfile(user.id, newName, avatar);
   if (updatedUser) {
     const accessToken = generateToken(
       {
@@ -294,8 +311,8 @@ const handleEditProfile = async (req, res) => {
     return res
       .cookie("access_token", accessToken, {
         httpOnly: true,
-        sameSite: "Strict",
-        secure: false, // true in production
+        sameSite: "lax",
+        secure: true, // true in production
         maxAge: 15 * 60 * 1000, // 1 min
       })
       .redirect("/profile");
@@ -336,7 +353,7 @@ const handleSetPassword = async (req, res) => {
 
   const { password } = body;
 
-  if (password) {
+  if (!password) {
     req.flash("errors", "Password is required");
     return res.redirect("/set-password");
   }
@@ -618,6 +635,51 @@ const handleForgetPassword = async (req, res) => {
   }
 };
 
+const handleUserLinks = async (req, res) => {
+  const { userId } = req.params;
+  const page = Number(req.query.page);
+
+  if (userId !== req.user.id) {
+    return res.render("error", { message: "Page Not Found" });
+  }
+
+  if (!page || page <= 0) {
+    return res.redirect(`/user/${req.user.id}/links?page=1`);
+  }
+
+  try {
+    const { links, totalLinks } = await loadLinks({
+      limit: 10,
+      skip: (page - 1) * 10,
+      createdBy: req.user.id,
+    });
+
+    const totalPages = Math.ceil(totalLinks / 10);
+    const startPage = Math.max(1, page - 1);
+    const endPage = Math.min(totalPages, page + 1);
+
+    if (totalLinks > 0 && page > totalPages) {
+      return res.redirect(`/user/${req.user.id}/links?page=1`);
+    }
+
+    return res.render("userLinks", {
+      successes: req.flash("successes"),
+      errors: req.flash("errors"),
+      host: req.host,
+      links,
+      totalPages,
+      startPage,
+      endPage,
+      currentPage: page,
+    });
+  } catch (error) {
+    console.log(error);
+
+    req.flash("errors", "Internal Server Error");
+    return res.redirect(`/user/${req.user.id}/links?page=1`);
+  }
+};
+
 const handleRegisterPage = (req, res) => {
   const { user } = req;
   if (user) {
@@ -648,23 +710,39 @@ const handleProfilePage = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const userProfile = await getUserWithLinks(user.id);
+  const userWithOAuthProvider = await getUserWithOAuthProvider(user.email);
 
-  if (userProfile) {
-    const date = new Date(userProfile.createdAt);
+  if (userWithOAuthProvider) {
+    const date = new Date(userWithOAuthProvider.createdAt);
     const formattedDate = `${String(date.getDate()).padStart(2, "0")}/${String(
       date.getMonth() + 1
     ).padStart(2, "0")}/${date.getFullYear()}`;
+
+    const {
+      isVerified,
+      password,
+      oauthAvatar,
+      avatar: localAvatar,
+      oauthUser,
+      shortenedUrls,
+    } = userWithOAuthProvider;
+
+    const avatar =
+      oauthUser.provider !== "internal" && Boolean(oauthAvatar)
+        ? oauthAvatar
+        : Boolean(localAvatar)
+        ? localAvatar
+        : null;
 
     return res.render("profile", {
       successes: req.flash("successes"),
       errors: req.flash("errors"),
       host: req.host,
-      links: userProfile.shortenedUrls,
-      isVerified: userProfile.isVerified,
+      linksLength: shortenedUrls.length,
+      isVerified,
       since: formattedDate,
-      isPasswordPresent: userProfile.password ? true : false,
-      avatar: userProfile.avatar,
+      isPasswordPresent: Boolean(password),
+      avatar,
     });
   }
 };
@@ -743,9 +821,11 @@ const handleEditProfilePage = async (req, res) => {
 
   const loggedUser = await getUserById(user.id);
   if (loggedUser) {
+    const { avatar } = loggedUser;
     return res.render("editProfile", {
       errors: req.flash("errors"),
       successes: req.flash("successes"),
+      avatar,
     });
   }
 };
@@ -977,7 +1057,7 @@ const handleOAuthCallback = async (req, res) => {
 
       user.refreshToken = refreshToken;
       user.isVerified = socialAccount.isVerified;
-      user.avatar = socialAccount.avatar;
+      user.oauthAvatar = socialAccount.avatar;
       user.save({ validateBeforeSave: false });
 
       req.flash(
@@ -1007,7 +1087,7 @@ const handleOAuthCallback = async (req, res) => {
       const newUser = await createUser({
         name: socialAccount.name,
         email: socialAccount.email,
-        avatar: socialAccount.avatar,
+        oauthAvatar: socialAccount.avatar,
         refreshToken: "",
         resetPasswordToken: "",
         isVerified: socialAccount.isVerified,
@@ -1078,6 +1158,7 @@ export {
   handleChangePassword,
   handleResetPassword,
   handleForgetPassword,
+  handleUserLinks,
   handleRegisterPage,
   handleLoginPage,
   handleProfilePage,

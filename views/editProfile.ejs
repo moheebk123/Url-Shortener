@@ -7,26 +7,46 @@
     <title>Edit Profile</title>
   </head>
   <body>
-    <%- include("layout/header.ejs") %>
-
-
-    <% if (successes && successes.length > 0) { %>
-      <% successes.forEach((success) => { %>
-        <p class="flash-success"><%= success %></p>
-      <% }) %>
-    <% } %>
-
-    <% if (errors && errors.length > 0) { %>
-      <% errors.forEach((error) => { %>
-        <p class="flash-error"><%= error %></p>
-      <% }) %>
-    <% } %>
+    <%- include("layout/header.ejs") %> <% if (successes && successes.length >
+    0) { %> <% successes.forEach((success) => { %>
+    <p class="flash-success"><%= success %></p>
+    <% }) %> <% } %> <% if (errors && errors.length > 0) { %> <%
+    errors.forEach((error) => { %>
+    <p class="flash-error"><%= error %></p>
+    <% }) %> <% } %>
 
     <div id="main">
       <% if (user) { %>
       <div class="user-login-success">You are logged in</div>
-      <form class="input-box" action="/edit-profile" method="post">
+      <form
+        class="input-box"
+        action="/edit-profile"
+        method="post"
+        enctype="multipart/form-data"
+      >
         <h2 class="heading">Edit Your Profile</h2>
+        <div class="avatar-upload">
+          <div class="avatar-preview">
+            <img src="<%= avatar %>" alt="Avatar" class="avatar big" id="avatar-preview-img" />
+            <div
+              class="avatar big avatar-preview-text"
+              id="avatar-preview-text"
+            >
+              <%= user.name.slice(0, 1) %>
+            </div>
+          </div>
+          <div class="avatar-edit">
+            <input
+              type="file"
+              name="avatar"
+              id="avatar"
+              accept="image/*"
+              style="display: none"
+            />
+            <button class="edit" type="button">Change Photo</button>
+            <button class="delete" type="button">Remove</button>
+          </div>
+        </div>
         <div class="box">
           <input
             type="text"
@@ -61,6 +81,50 @@
           });
         }
       }, 5000);
+
+      const previewImg = document.querySelector("#avatar-preview-img");
+      const previewText = document.querySelector("#avatar-preview-text");
+      const fileInput = document.querySelector("#avatar");
+      const changeImgBtn = document.querySelector(".edit");
+      const removeImgBtn = document.querySelector(".delete");
+
+      if (
+        previewImg.src &&
+        previewImg.complete &&
+        previewImg.naturalWidth !== 0
+      ) {
+        previewText.style.display = "none";
+        previewImg.style.display = "grid";
+      } else {
+        previewImg.style.display = "none";
+        previewText.style.display = "grid";
+      }
+
+      changeImgBtn.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", () => {
+        const [file] = fileInput.files;
+        if (file.type.includes("image/") && file.size <= 5 * 1024 * 1024) {
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            previewImg.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+
+          previewText.style.display = "none";
+          previewImg.style.display = "grid";
+        } else {
+          previewImg.style.display = "none";
+          previewText.style.display = "grid";
+        }
+      });
+
+      removeImgBtn.addEventListener("click", () => {
+        fileInput.value = "";
+        previewImg.src = "";
+        previewImg.style.display = "none";
+        previewText.style.display = "grid";
+      });
     </script>
   </body>
 </html>

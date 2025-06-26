@@ -35,41 +35,11 @@
       <div class="links-overview-box">
         <h2 class="heading">Shortened URLs</h2>
         <div class="links-overview">
-          <%= links.length %>
+          <%= linksLength %>
           <div>Links Created</div>
         </div>
       </div>
-      <% if (links && links.length > 0) { %>
-      <div class="url-box">
-        <%links.map(({_id, shortCode, url, createdBy}) => {%> <% const
-        truncatedUrl = url.length >= 50 ? `${url.slice(0, 50)}...` : url; %>
-        <div class="shorten-url">
-          <div class="shorten-url-box">
-            <a
-              href="/shortUrl/<%= shortCode %>"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <%= host + "/shortUrl/" + shortCode %>
-            </a>
-            <br />
-            <div><%= truncatedUrl %></div>
-          </div>
-
-          <div class="action-button">
-            <button class="edit">
-              <a href="/edit-shortened-url/<%= _id %>" type="button">Edit</a>
-            </button>
-            <form action="/delete/<%= _id %>" method="post">
-              <button class="delete" type="submit">Delete</button>
-            </form>
-          </div>
-        </div>
-        <% }) %>
-      </div>
-      <% } else { %>
-      <h3>No Shortened Url</h3>
-      <% } %>
+      <button class="edit view"><a href="/user/<%= user.id %>/links?page=1">View Shortened URLs</a></button>
       <div class="verification-status">
         Email verification:
         <div class="verify-button-box">

@@ -15,7 +15,10 @@ const userSchema = mongoose.Schema(
     password: {
       type: String,
       default: undefined,
-      maxLength: 30,
+    },
+    oauthAvatar: {
+      type: String,
+      default: "",
     },
     avatar: {
       type: String,

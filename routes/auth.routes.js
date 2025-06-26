@@ -20,9 +20,11 @@ import {
   handleChangePassword,
   handleResetPassword,
   handleForgetPassword,
+  handleUserLinks,
   handleOAuthRedirect,
   handleOAuthCallback,
 } from "../controllers/auth.controller.js";
+import { avatarUpload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -36,12 +38,14 @@ router.route("/verify-email").get(handleVerifyEmailPage).post(handleVerifyEmail)
 
 router.route("/resend-verification-link").get(handleResendVerificationLink);
 
+router.get("/user/:userId/links", handleUserLinks);
+
 router.route("/profile").get(handleProfilePage);
 
 router
   .route("/edit-profile")
   .get(handleEditProfilePage)
-  .post(handleEditProfile);
+  .post(avatarUpload.single("avatar"), handleEditProfile);
 
 router
   .route("/set-password")

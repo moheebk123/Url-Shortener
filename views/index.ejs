@@ -60,11 +60,13 @@
               <%= host + "/shortUrl/" + shortCode %>
             </a>
             <br />
-            <div><%= truncatedUrl %></div>
+            <div title="<%= url %>"><%= truncatedUrl %></div>
           </div>
         </div>
         <% }) %>
-        <a href="/links">See all shortened urls</a>
+        <div class="pagination">
+          <a href="/links?page=1">See all shortened urls</a>
+        </div>
       </div>
       <% } else { %>
       <h3>No Shortened Url</h3>

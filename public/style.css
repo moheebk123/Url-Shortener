@@ -138,15 +138,22 @@ nav {
       font-weight: 600;
       text-decoration: none;
       margin-inline: 10px;
+      transition: 0.3s ease-in-out;
+      -webkit-transition: 0.3s ease-in-out;
+      -moz-transition: 0.3s ease-in-out;
+      -ms-transition: 0.3s ease-in-out;
+      -o-transition: 0.3s ease-in-out;
+
+      &:hover {
+        text-decoration: underline;
+        color: #2370eb;
+      }
     }
   }
 
   & > div.mobile-menu {
     background-color: #fff;
     display: none;
-    flex-direction: column;
-    text-align: center;
-    gap: 1em;
     width: 100vw;
     height: 100vh;
     padding: 1em;
@@ -164,22 +171,42 @@ nav {
       left: 0;
     }
 
-    & > a {
-      color: black;
-      font-weight: 600;
-      text-decoration: none;
-      margin-inline: 10px;
-      font-size: 1.5em;
+    & > div {
+      width: fit-content;
+      margin-inline: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2em;
+
+      & > a {
+        color: black;
+        font-weight: 600;
+        text-decoration: none;
+        margin-inline: 10px;
+        font-size: 1.5em;
+        flex-grow: 1;
+        transition: 0.3s ease-in-out;
+        -webkit-transition: 0.3s ease-in-out;
+        -moz-transition: 0.3s ease-in-out;
+        -ms-transition: 0.3s ease-in-out;
+        -o-transition: 0.3s ease-in-out;
+
+        &:hover {
+          text-decoration: underline;
+          color: #2370eb;
+        }
+      }
     }
 
     & > img.close-menu {
       height: 40px;
       width: 40px;
       margin-bottom: 1.5em;
+      align-self: flex-start;
     }
   }
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 768px) {
     padding: 1em;
     justify-content: space-between;
 
@@ -188,7 +215,7 @@ nav {
     }
 
     & > div.mobile-menu {
-      display: flex;
+      display: block;
     }
 
     & > img.open-menu {
@@ -285,6 +312,15 @@ button {
       padding-inline: 41px;
     }
 
+    &.view {
+      margin-inline: auto;
+      border-radius: 50px;
+      -webkit-border-radius: 50px;
+      -moz-border-radius: 50px;
+      -ms-border-radius: 50px;
+      -o-border-radius: 50px;
+    }
+
     &.delete {
       background-color: #ff6060;
     }
@@ -303,8 +339,8 @@ button {
   flex-wrap: wrap;
   gap: 1em;
   align-items: center;
-  width: 100%;
-  border-bottom: 1px solid #aaa;
+  max-width: 100%;
+  border-top: 1px solid #aaa;
 
   & > div.avatar {
     display: none;
@@ -318,12 +354,10 @@ button {
     background-color: #e3ecfd;
   }
 
-  & > div {
-    color: #888;
-  }
-
   & > .shorten-url-box {
+    color: #888;
     flex-grow: 1;
+    overflow-wrap: anywhere;
   }
 
   & > div.action-button {
@@ -463,6 +497,7 @@ p {
   justify-content: space-between;
   gap: 1em;
   align-items: center;
+  border-top: 1px solid #aaa;
 }
 
 .verification-status {
@@ -667,5 +702,21 @@ p {
     color: white;
     border-radius: 4px;
     cursor: pointer;
+  }
+}
+
+.avatar-upload {
+  & > .avatar-preview {
+    margin-bottom: 10px;
+
+    & > :is(#avatar-preview-img, #avatar-preview-text) {
+      display: none;
+    }
+  }
+
+  & > .avatar-edit {
+    display: flex;
+    gap: 10px;
+    align-items: center;
   }
 }

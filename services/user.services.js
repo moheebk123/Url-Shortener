@@ -16,10 +16,6 @@ export const getUserByResetPasswordToken = async (resetPasswordToken) => {
   return await User.findOne({resetPasswordToken});
 };
 
-export const getUserWithLinks = async (userId) => {
-  return await User.findById(userId).populate("shortenedUrls");
-};
-
 export const getUserWithOAuthProvider = async (email) => {
   return await User.findOne({email}).populate("oauthUser");
 };
@@ -42,9 +38,9 @@ export const updateVerification = async (userId, verificationCode, isVerified=fa
   });
 };
 
-export const updateName = async (userId, name) => {
+export const updateUserProfile = async (userId, name, avatar) => {
   return await User.findByIdAndUpdate(userId, {
-    $set: { name },
+    $set: { name, avatar },
   });
 };
 

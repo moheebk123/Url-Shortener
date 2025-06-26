@@ -5,6 +5,7 @@
     <a href="/about">About</a>
     <a href="/links">Links</a>
     <% if (user) { %>
+    <a href="/user/<%= user.id %>/links?page=1">Your Links</a>
     <a href="/profile">Profile</a>
     <% } else { %>
     <a href="/register">Register</a>
@@ -14,15 +15,18 @@
   <img src="/menu-open.png" alt="Open" class="open-menu">
   <div class="mobile-menu">
     <img src="/menu-close.png" alt="Close" class="close-menu">
-    <a href="/">Home</a>
-    <a href="/about">About</a>
-    <a href="/links">Links</a>
-    <% if (user) { %>
-    <a href="/profile">Profile</a>
-    <% } else { %>
-    <a href="/register">Register</a>
-    <a href="/login">Login</a>
-    <% } %>
+    <div>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/links">Links</a>
+      <% if (user) { %>
+        <a href="/user/<%= user.id %>/links?page=1">Your Links</a>
+      <a href="/profile">Profile</a>
+      <% } else { %>
+      <a href="/register">Register</a>
+      <a href="/login">Login</a>
+      <% } %>
+    </div>
   </div>
 </nav>
 <script>

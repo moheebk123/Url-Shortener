@@ -8,6 +8,13 @@
   </head>
   <body>
     <%- include("layout/header.ejs") %>
+    <% if (successes && successes.length >
+    0) { %> <% successes.forEach((success) => { %>
+    <p class="flash-success"><%= success %></p>
+    <% }) %> <% } %> <% if (errors && errors.length > 0) { %> <%
+    errors.forEach((error) => { %>
+    <p class="flash-error"><%= error %></p>
+    <% }) %> <% } %>
 
     <div id="main">
       <% if (user) { %>
@@ -19,10 +26,9 @@
       <h2 class="heading">Shortened URLs</h2>
       <% if (links && links.length > 0) { %>
       <div class="url-box">
-        <% links.map(({shortCode, url, createdBy}) => {%>
-          <% const truncatedUrl = url.length >= 50 ? `${url.slice(0, 50)}...` : url; %>
+        <%links.map(({shortCode, url,  _id}) => {%> <% const truncatedUrl =
+        url.length >= 50 ? `${url.slice(0, 50)}...` : url; %>
         <div class="shorten-url">
-          <div class="avatar"><%= createdBy?.name.slice(0, 1) %></div>
           <div class="shorten-url-box">
             <a
               href="/shortUrl/<%= shortCode %>"
@@ -34,16 +40,24 @@
             <br />
             <div title="<%= url %>"><%= truncatedUrl %></div>
           </div>
+          <div class="action-button">
+            <button class="edit">
+              <a href="/edit-shortened-url/<%= _id %>" type="button">Edit</a>
+            </button>
+            <form action="/delete/<%= _id %>" method="post">
+              <button class="delete" type="submit">Delete</button>
+            </form>
+          </div>
         </div>
         <% }) %>
       </div>
       <% if (totalPages > 1) { %>
         <div class="pagination">
           <% if (currentPage > 1) { %>
-            <a href="/links?page=<%= currentPage - 1 %>">< <span>Previous</span></a>
+            <a href="/user/<%= user.id %>/links?page=<%= currentPage - 1 %>">< <span>Previous</span></a>
           <% } %>
           <% if (startPage > 1) { %>
-            <a href="/links?page=1">1</a>
+            <a href="/user/<%= user.id %>/links?page=1">1</a>
             <% if (startPage > 2) { %>
               <div>...</div>
             <% } %>
@@ -52,7 +66,7 @@
             <% if (i === currentPage) { %>
               <span class="current"><%= currentPage %></span>
             <% } else { %>
-              <a href="/links?page=<%= i %>"><%= i %></a>
+              <a href="/user/<%= user.id %>/links?page=<%= i %>"><%= i %></a>
             <% } %>
 
           <% } %>
@@ -60,10 +74,10 @@
             <% if (endPage < (totalPages - 1)) { %>
               <div>...</div>
             <% } %>
-            <a href="/links?page=<%= totalPages %>"><%= totalPages %></a>
+            <a href="/user/<%= user.id %>/links?page=<%= totalPages %>"><%= totalPages %></a>
           <% } %>
           <% if (currentPage < totalPages) { %>
-            <a href="/links?page=<%= currentPage + 1 %>"><span>Next</span> ></a>
+            <a href="/user/<%= user.id %>/links?page=<%= currentPage + 1 %>"><span>Next</span> ></a>
           <% } %>
         </div>
       <% } %>

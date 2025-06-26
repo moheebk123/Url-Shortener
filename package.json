@@ -1,7 +1,7 @@
 {
   "name": "url-shortener",
   "version": "1.0.0",
-  "description": "URL Shortener using Node.js, Express.js and MongoDB with Pagination",
+  "description": "URL Shortener using Node.js, Express.js and MongoDB with File Upload",
   "main": "app.js",
   "type": "module",
   "scripts": {
@@ -13,14 +13,17 @@
   "dependencies": {
     "arctic": "^3.7.0",
     "argon2": "^0.43.0",
+    "cloudinary": "^2.7.0",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.2",
+    "multer": "^2.0.1",
     "nodemailer": "^7.0.3",
     "zod": "^3.24.4"
   },
