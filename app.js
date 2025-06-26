@@ -1,8 +1,7 @@
-import path from "path";
 import express from "express";
 import { env } from ".//config/env.config.js";
+import path from "path";
 import { shortenedUrlRoutes } from "./routes/shortenedUrlRoutes.routes.js";
-import { connectDB } from "./config/db-client.config.js";
 
 const app = express();
 
@@ -19,11 +18,6 @@ app.use((req, res) => {
   return res.status(404).sendFile(path.join(import.meta.dirname, "views", "error.html"));
 });
 
-try {
-  await connectDB();
-  app.listen(env.PORT, () => {
-    console.log(`Server listening on http://localhost:${env.PORT}`);
-  });
-} catch (error) {
-  console.error(error)
-}
+app.listen(env.PORT, () => {
+  console.log(`Server listening on http://localhost:${env.PORT}`);
+});
