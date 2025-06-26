@@ -8,29 +8,19 @@ import {
   updateLink,
   deleteLink,
 } from "../services/links.services.js";
-import { getUserById, pushShortenedUrl } from "../services/user.services.js";
+import { pushShortenedUrl } from "../services/user.services.js";
 
 const viewFolderPath = path.join(path.dirname(import.meta.dirname), "views");
 
 export const handleRoot = async (req, res) => {
   try {
-    let isVerified = false;
     const links = await loadLinks();
-    const { user } = req;
-    if (user) {
-      const loggedUser = await getUserById(user.id);
-
-      if (loggedUser && loggedUser.isVerified) {
-        isVerified = true;
-      }
-    }
 
     return res.render("index", {
       links,
       host: req.host,
       errors: req.flash("errors"),
       successes: req.flash("successes"),
-      isVerified,
     });
   } catch (error) {
     console.log(error);
@@ -149,19 +139,22 @@ export const handleEdit = async (req, res) => {
       const { url, shortCode } = req.body;
 
       if (!url) {
-        req.flash("errors", "Url is required.");
+        req.flash(
+          "errors",
+          "Url is required."
+        );
         return res.redirect(req.url);
       }
 
       const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
 
-      const updatedShortUrl = await updateLink(shortenedUrl._id, {
-        url,
-        shortCode: finalShortCode,
-      });
+      const updatedShortUrl = await updateLink(shortenedUrl._id, {url, shortCode: finalShortCode})
 
       if (updatedShortUrl) {
-        req.flash("successes", "Shortened Url updated successfully");
+        req.flash(
+          "successes",
+          "Shortened Url updated successfully"
+        );
         return res.redirect("/profile");
       }
     } else {
@@ -201,10 +194,12 @@ export const handleDelete = async (req, res) => {
         "You are not authenticated to delete this shortened url"
       );
     }
+
   } catch (error) {
     console.log(error);
 
     req.flash("errors", "Internal Server Error");
     return res.redirect("/profile");
+
   }
 };
