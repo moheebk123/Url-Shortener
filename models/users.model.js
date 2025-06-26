@@ -19,6 +19,10 @@ const userSchema = mongoose.Schema(
     },
     refreshToken: String,
     isVerified: Boolean,
+    verificationCode: {
+      type: String,
+      maxLength: 8,
+    },
     shortenedUrls: [
       {
         type: mongoose.Schema.Types.ObjectId,

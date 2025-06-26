@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/style.css" />
-    <title>URL Shortener</title>
+    <title>Verify Email</title>
   </head>
   <body>
     <%- include("layout/header.ejs") %> <% if (successes && successes.length >0)
@@ -18,55 +18,36 @@
     <div id="main">
       <% if (user) { %>
       <div class="user-login-success">You are logged in</div>
-      <% } else { %>
-      <div class="user-login-warning">You are not-logged in</div>
-      <% } %> <% if (isVerified) { %>
-      <form class="input-box" action="/" method="post">
-        <h2 class="heading">URL Shortener</h2>
+      <h2 class="heading">Verify Your Email</h2>
+      <form class="input-box" action="/resend-verification-link" method="get">
         <div class="box">
-          <input
-            type="url"
-            name="url"
-            class="url"
-            placeholder="Enter URL"
-            required
-          />
+          <strong
+            >Email: <i><%= user.email %></i><br /><br />Your email has not been
+            verified yet. Please verify your email by entering the 8-digit code
+            or request a new verification link.</strong
+          >
         </div>
+        <br />
+        <button type="submit" class="resend-link">
+          Resend Verification Link
+        </button>
+      </form>
+      <form class="input-box" action="/verify-email" method="post">
         <div class="box">
           <input
             type="text"
-            name="shortCode"
-            class="custom-url"
-            placeholder="Enter custom short code (Optional)"
+            name="verifyCode"
+            class="verify-code"
+            placeholder="Enter 8 Digit Verification Code"
+            maxlength="8"
+            pattern="\d{8}"
+            required
           />
         </div>
-        <button type="submit">Short</button>
+        <button type="submit">Verify Code</button>
       </form>
-      <% } %>
-
-      <h2 class="heading">Shortened URLs</h2>
-      <% if (links && links.length > 0) { %>
-      <div class="url-box">
-        <%links.map(({shortCode, url, createdBy}) => {%> <% const truncatedUrl =
-        url.length >= 50 ? `${url.slice(0, 50)}...` : url; %>
-        <div class="shorten-url">
-          <div class="avatar"><%= createdBy?.name.slice(0, 1) %></div>
-          <div class="shorten-url-box">
-            <a
-              href="/<%= shortCode %>"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <%= host + "/" + shortCode %>
-            </a>
-            <br />
-            <div><%= truncatedUrl %></div>
-          </div>
-        </div>
-        <% }) %>
-      </div>
       <% } else { %>
-      <h3>No Shortened Url</h3>
+      <div class="user-login-warning">You are not-logged in</div>
       <% } %>
     </div>
 
