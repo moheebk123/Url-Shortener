@@ -14,7 +14,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.ORIGIN,
     credentials: true,
   })
 );
@@ -27,7 +27,7 @@ app.use(cookieParser());
 
 app.use(
   session({
-    secret: process.env.JWT_SECRET || "moheebkhan",
+    secret: process.env.JWT_SECRET,
     resave: true,
     saveUninitialized: false,
   })
