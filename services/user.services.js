@@ -12,6 +12,10 @@ export const getUserById = async (userId) => {
   return await User.findById(userId);
 };
 
+export const getUserByResetPasswordToken = async (resetPasswordToken) => {
+  return await User.findOne({resetPasswordToken});
+};
+
 export const getUserWithLinks = async (userId) => {
   return await User.findById(userId).populate("shortenedUrls");
 };
@@ -37,6 +41,12 @@ export const updateVerification = async (userId, verificationCode, isVerified=fa
 export const updateName = async (userId, name) => {
   return await User.findByIdAndUpdate(userId, {
     $set: { name },
+  });
+};
+
+export const updatePassword = async (userId, password) => {
+  return await User.findByIdAndUpdate(userId, {
+    $set: { password },
   });
 };
 

@@ -1,6 +1,6 @@
 <nav>
   <h3>Url Shortener</h3>
-  <div>
+  <div class="desktop-menu">
     <a href="/">Home</a>
     <a href="/about">About</a>
     <% if (user) { %>
@@ -13,4 +13,24 @@
     <a href="/login">Login</a>
     <% } %>
   </div>
+  <img src="/menu-open.png" alt="Open" class="open-menu">
+  <div class="mobile-menu">
+    <img src="/menu-close.png" alt="Close" class="close-menu">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <% if (user) { %>
+    <a href="/profile">Profile</a>
+    <% } else { %>
+    <a href="/register">Register</a>
+    <a href="/login">Login</a>
+    <% } %>
+  </div>
 </nav>
+<script>
+  document.querySelector(".open-menu").addEventListener("click", () => {
+    document.querySelector(".mobile-menu").classList.add("active")
+  })
+  document.querySelector(".close-menu").addEventListener("click", () => {
+    document.querySelector(".mobile-menu").classList.remove("active")
+  })
+</script>

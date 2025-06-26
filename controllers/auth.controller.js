@@ -1,12 +1,14 @@
 import { loginUserSchema, registerUserSchema } from "../config/auth.config.js";
 import {
-  getUserByEmail,
   createUser,
+  getUserByEmail,
   getUserById,
-  updateRefreshToken,
   getUserWithLinks,
-  updateVerification,
+  getUserByResetPasswordToken,
+  updateRefreshToken,
   updateName,
+  updatePassword,
+  updateVerification,
   deleteUser,
 } from "../services/user.services.js";
 import {
@@ -14,9 +16,13 @@ import {
   generateToken,
   isPasswordCorrect,
   generateVerifyCode,
+  verifyToken,
 } from "../services/auth.services.js";
-import { sendVerificationCode } from "../services/email.services.js";
-import { deleteLink, deleteUserLinks } from "../services/links.services.js";
+import {
+  sendResetPassword,
+  sendVerificationCode,
+} from "../services/email.services.js";
+import { deleteUserLinks } from "../services/links.services.js";
 
 const handleRegister = async (req, res) => {
   try {
@@ -209,8 +215,8 @@ const handleResendVerificationLink = async (req, res) => {
 };
 
 const handleVerifyEmail = async (req, res) => {
-  const { user, query } = req;
-  console.log(query);
+  const { user, body } = req;
+
   if (!user) {
     req.flash(
       "errors",
@@ -225,7 +231,7 @@ const handleVerifyEmail = async (req, res) => {
     return res.redirect("/profile");
   }
 
-  const verificationCode = req.body.verifyCode;
+  const verificationCode = body.verifyCode;
   if (verificationCode === loggedUser.verificationCode) {
     await updateVerification(loggedUser._id, "", true);
 
@@ -239,21 +245,18 @@ const handleVerifyEmail = async (req, res) => {
 const handleEditProfile = async (req, res) => {
   const { user, body } = req;
   if (!user) {
-    req.flash(
-      "errors",
-      "You are not authenticated to edit profile"
-    );
+    req.flash("errors", "You are not authenticated to edit profile");
     return res.redirect("/login");
   }
   const newName = body.name;
-  const oldName = user.name
+  const oldName = user.name;
 
   if (oldName === newName) {
     req.flash("errors", "Nothing to edit in profile");
     res.redirect("/edit-profile");
   }
 
-  const updatedUser = await updateName(user.id, newName)
+  const updatedUser = await updateName(user.id, newName);
   if (updatedUser) {
     const accessToken = generateToken(
       {
@@ -287,8 +290,8 @@ const handleDeleteAccount = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const deletedUser = await deleteUser(user.id)
-  const deletedLinks = await deleteUserLinks(user.id)
+  const deletedUser = await deleteUser(user.id);
+  const deletedLinks = await deleteUserLinks(user.id);
 
   if (deletedUser && deletedLinks) {
     req.flash("successes", "User account deleted successfully");
@@ -297,7 +300,231 @@ const handleDeleteAccount = async (req, res) => {
     req.flash("errors", "Failed to delete user account");
     res.redirect("/profile");
   }
-}
+};
+
+const handleChangePassword = async (req, res) => {
+  const { user, body } = req;
+  if (!user) {
+    req.flash("errors", "You are not authenticated to change password");
+    return res.redirect("/login");
+  }
+
+  const { oldPassword, newPassword } = body;
+
+  if (!oldPassword || !newPassword) {
+    req.flash("errors", "All fields are required");
+    return res.redirect("/change-password");
+  }
+
+  if (oldPassword === newPassword) {
+    req.flash("errors", "New password must be different from current password");
+    return res.redirect("/change-password");
+  }
+
+  if (newPassword.length < 8) {
+    req.flash("errors", "New password must be at least 8 characters long");
+    return res.redirect("/change-password");
+  }
+
+  if (!newPassword.match(/\d/)) {
+    req.flash("errors", "New password must contain a number");
+    return res.redirect("/change-password");
+  }
+
+  if (!newPassword.match(/[a-z]/)) {
+    req.flash("errors", "New password must include a lowercase letter");
+    return res.redirect("/change-password");
+  }
+
+  if (!newPassword.match(/[A-Z]/)) {
+    req.flash("errors", "New password must include an uppercase letter");
+    return res.redirect("/change-password");
+  }
+
+  if (!newPassword.match(/[^\w\s]/)) {
+    req.flash("errors", "New password must include a special character");
+    return res.redirect("/change-password");
+  }
+
+  const loggedUser = await getUserById(user.id);
+
+  if (loggedUser) {
+    const isPasswordValid = await isPasswordCorrect(
+      oldPassword,
+      loggedUser.password
+    );
+
+    if (!isPasswordValid) {
+      req.flash("errors", "Current password you entered is invalid");
+      return res.redirect("/change-password");
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    if (hashedPassword) {
+      const updatedUser = await updatePassword(loggedUser._id, hashedPassword);
+      if (updatedUser) {
+        req.flash("successes", "Password changed successfully");
+        return res.redirect("/profile");
+      } else {
+        req.flash("errors", "Failed to change password");
+        return res.redirect("/change-password");
+      }
+    }
+  } else {
+    req.flash("errors", "Failed to change password");
+    return res.redirect("/change-password");
+  }
+};
+
+const handleResetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || email.length === 0) {
+    req.flash("errors", "Email is required to send reset password mail.");
+    return res.redirect("/reset-password");
+  }
+
+  try {
+    const existedUser = await getUserByEmail(email);
+    if (existedUser) {
+      const resetPasswordToken = generateToken(
+        {
+          email: existedUser.email,
+        },
+        process.env.JWT_SECRET,
+        "1h"
+      );
+
+      existedUser.resetPasswordToken = resetPasswordToken;
+      existedUser.save({ validateBeforeSave: false });
+
+      try {
+        const resetPasswordLink = `http://${req.host}/forget-password/${resetPasswordToken}`;
+        const success = await sendResetPassword(
+          existedUser.email,
+          resetPasswordLink
+        );
+
+        if (success) {
+          req.flash("successes", "Reset password link send to your email");
+        } else {
+          req.flash("errors", "Failed to send reset password link. Try Again.");
+        }
+        return res.redirect("/reset-password");
+      } catch (error) {
+        console.log(error);
+
+        req.flash("errors", "Failed to send reset password link. Try Again.");
+        return res.redirect("/reset-password");
+      }
+    } else {
+      req.flash("errors", "Please enter a registered email");
+    }
+    return res.redirect("/reset-password");
+  } catch (error) {
+    console.log(error);
+    req.flash("errors", "Internal server error.");
+    return res.redirect("/reset-password");
+  }
+};
+
+const handleForgetPassword = async (req, res) => {
+  try {
+    const { body, params } = req;
+    const { resetPasswordToken } = params;
+
+    const loggedUser = await getUserByResetPasswordToken(resetPasswordToken);
+
+    if (loggedUser) {
+      try {
+        const decodedToken = verifyToken(resetPasswordToken);
+
+        if (decodedToken && decodedToken.email === loggedUser.email) {
+          const { repeatPassword, newPassword } = body;
+
+          if (!repeatPassword || !newPassword) {
+            req.flash("errors", "All fields are required");
+            return res.redirect(req.url);
+          }
+
+          if (repeatPassword !== newPassword) {
+            req.flash(
+              "errors",
+              "New password must be similar to Repeat password"
+            );
+            return res.redirect(req.url);
+          }
+
+          if (newPassword.length < 8) {
+            req.flash(
+              "errors",
+              "New password must be at least 8 characters long"
+            );
+            return res.redirect(req.url);
+          }
+
+          if (!newPassword.match(/\d/)) {
+            req.flash("errors", "New password must contain a number");
+            return res.redirect(req.url);
+          }
+
+          if (!newPassword.match(/[a-z]/)) {
+            req.flash("errors", "New password must include a lowercase letter");
+            return res.redirect(req.url);
+          }
+
+          if (!newPassword.match(/[A-Z]/)) {
+            req.flash(
+              "errors",
+              "New password must include an uppercase letter"
+            );
+            return res.redirect(req.url);
+          }
+
+          if (!newPassword.match(/[^\w\s]/)) {
+            req.flash(
+              "errors",
+              "New password must include a special character"
+            );
+            return res.redirect(req.url);
+          }
+          const hashedPassword = await hashPassword(newPassword);
+
+          if (hashedPassword) {
+            const updatedUser = await updatePassword(
+              loggedUser._id,
+              hashedPassword
+            );
+            if (updatedUser) {
+              loggedUser.resetPasswordToken = "";
+              loggedUser.save({ validateBeforeSave: false });
+              req.flash("successes", "Password reset successfully");
+              return res.redirect("/login");
+            } else {
+              req.flash("errors", "Failed to reset password");
+              return res.redirect(req.url);
+            }
+          }
+        } else {
+          req.flash("errors", "Reset password link expired. Generate again.");
+          return res.redirect("/reset-password");
+        }
+      } catch (error) {
+        console.log(error);
+        req.flash("errors", "Reset password link expired. Generate again.");
+        return res.redirect("/reset-password");
+      }
+    } else {
+      req.flash("errors", "Invalid reset password link. Generate again.");
+      return res.redirect("/reset-password");
+    }
+  } catch (error) {
+    console.log(error);
+    req.flash("errors", "Internal server error");
+    return res.redirect(req.url);
+  }
+};
 
 const handleRegisterPage = (req, res) => {
   return res.render("register", { errors: req.flash("errors") });
@@ -417,6 +644,52 @@ const handleEditProfilePage = async (req, res) => {
   }
 };
 
+const handleChangePasswordPage = async (req, res) => {
+  const { user } = req;
+  if (!user) {
+    req.flash(
+      "errors",
+      "You are not authenticated to access change password page"
+    );
+    return res.redirect("/login");
+  }
+
+  const loggedUser = await getUserById(user.id);
+
+  if (loggedUser) {
+    return res.render("changePassword", {
+      errors: req.flash("errors"),
+      successes: req.flash("successes"),
+    });
+  }
+};
+
+const handleResetPasswordPage = (req, res) => {
+  return res.render("resetPassword", {
+    errors: req.flash("errors"),
+    successes: req.flash("successes"),
+  });
+};
+
+const handleForgetPasswordPage = async (req, res) => {
+  const { params } = req;
+
+  const loggedUser = await getUserByResetPasswordToken(
+    params.resetPasswordToken
+  );
+
+  if (loggedUser) {
+    return res.render("forgetPassword", {
+      errors: req.flash("errors"),
+      successes: req.flash("successes"),
+      resetPasswordUrl: req.url,
+    });
+  } else {
+    req.flash("errors", "Invalid reset password link. Generate again.");
+    return res.redirect("/reset-password");
+  }
+};
+
 export {
   handleRegister,
   handleLogin,
@@ -425,9 +698,15 @@ export {
   handleVerifyEmail,
   handleEditProfile,
   handleDeleteAccount,
+  handleChangePassword,
+  handleResetPassword,
+  handleForgetPassword,
   handleRegisterPage,
   handleLoginPage,
   handleProfilePage,
   handleVerifyEmailPage,
   handleEditProfilePage,
+  handleChangePasswordPage,
+  handleResetPasswordPage,
+  handleForgetPasswordPage,
 };

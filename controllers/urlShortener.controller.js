@@ -10,8 +10,6 @@ import {
 } from "../services/links.services.js";
 import { getUserById, pushShortenedUrl } from "../services/user.services.js";
 
-const viewFolderPath = path.join(path.dirname(import.meta.dirname), "views");
-
 export const handleRoot = async (req, res) => {
   try {
     let isVerified = false;

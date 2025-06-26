@@ -4,6 +4,9 @@ import {
   handleLoginPage,
   handleProfilePage,
   handleEditProfilePage,
+  handleChangePasswordPage,
+  handleResetPasswordPage,
+  handleForgetPasswordPage,
   handleRegister,
   handleLogin,
   handleEditProfile,
@@ -11,7 +14,10 @@ import {
   handleVerifyEmailPage,
   handleResendVerificationLink,
   handleVerifyEmail,
-  handleDeleteAccount
+  handleDeleteAccount,
+  handleChangePassword,
+  handleResetPassword,
+  handleForgetPassword,
 } from "../controllers/auth.controller.js";
 
 const router = Router();
@@ -32,6 +38,21 @@ router
   .route("/edit-profile")
   .get(handleEditProfilePage)
   .post(handleEditProfile);
+
+router
+  .route("/change-password")
+  .get(handleChangePasswordPage)
+  .post(handleChangePassword);
+
+router
+  .route("/reset-password")
+  .get(handleResetPasswordPage)
+  .post(handleResetPassword);
+
+router
+  .route("/forget-password/:resetPasswordToken")
+  .get(handleForgetPasswordPage)
+  .post(handleForgetPassword);
 
 router.route("/logout").get(handleLogout);
 

@@ -30,6 +30,36 @@ body {
 
     & > form.input-box {
       margin-bottom: 1em;
+
+      & > div.password-valid-box {
+        padding: 1em;
+        margin-bottom: 1em;
+        background-color: #e2edfd;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        border-radius: 15px;
+        -webkit-border-radius: 15px;
+        -moz-border-radius: 15px;
+        -ms-border-radius: 15px;
+        -o-border-radius: 15px;
+
+        & > h4 {
+          font-size: 1.1em;
+          font-weight: 400;
+        }
+
+        & > ul {
+          border: none;
+          display: block;
+          font-size: 1.1em;
+          font-weight: 400;
+          color: #888;
+          padding-block: 0.5em;
+        }
+
+        & li {
+          list-style: disc;
+        }
+      }
     }
 
     & > div.profile-box {
@@ -91,24 +121,78 @@ nav {
 
   & > h3 {
     margin-block: 0;
-    display: none;
+    color: #2370eb;
+  }
 
-    @media screen and (min-width: 600px) {
-      display: block;
+  & > img.open-menu {
+    height: 15px;
+    display: none;
+  }
+
+  & > div.desktop-menu {
+    width: fit-content;
+    display: block;
+
+    & > a {
+      color: black;
+      font-weight: 600;
+      text-decoration: none;
+      margin-inline: 10px;
     }
   }
 
-  & > div {
-    width: fit-content;
+  & > div.mobile-menu {
+    background-color: #fff;
+    display: none;
+    flex-direction: column;
+    text-align: center;
+    gap: 1em;
+    width: 100vw;
+    height: 100vh;
+    padding: 1em;
+    position: fixed;
+    top: 0;
+    left: 100%;
+    z-index: 10;
+    transition: 0.3s ease-in-out;
+    -webkit-transition: 0.3s ease-in-out;
+    -moz-transition: 0.3s ease-in-out;
+    -ms-transition: 0.3s ease-in-out;
+    -o-transition: 0.3s ease-in-out;
 
-    @media screen and (max-width: 600px) {
-      display: flex;
-      width: 100%;
-      justify-content: space-evenly;
+    &.active {
+      left: 0;
     }
 
     & > a {
+      color: black;
+      font-weight: 600;
+      text-decoration: none;
       margin-inline: 10px;
+      font-size: 1.5em;
+    }
+
+    & > img.close-menu {
+      height: 40px;
+      width: 40px;
+      margin-bottom: 1.5em;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    padding: 1em;
+    justify-content: space-between;
+
+    & > div.desktop-menu {
+      display: none;
+    }
+
+    & > div.mobile-menu {
+      display: flex;
+    }
+
+    & > img.open-menu {
+      display: block;
     }
   }
 }
