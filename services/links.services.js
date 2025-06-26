@@ -27,3 +27,7 @@ export const updateLink = async (id, updatedShortUrl) => {
 export const deleteLink = async (id) => {
   return await UrlShortener.findByIdAndDelete(id);
 };
+
+export const deleteUserLinks = async (createdBy) => {
+  return await UrlShortener.deleteMany({ createdBy });
+}

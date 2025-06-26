@@ -33,3 +33,13 @@ export const updateVerification = async (userId, verificationCode, isVerified=fa
     $set: { verificationCode, isVerified },
   });
 };
+
+export const updateName = async (userId, name) => {
+  return await User.findByIdAndUpdate(userId, {
+    $set: { name },
+  });
+};
+
+export const deleteUser = async (userId) => {
+  return await User.findByIdAndDelete(userId);
+};

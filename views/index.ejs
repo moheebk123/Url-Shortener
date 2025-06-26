@@ -53,11 +53,11 @@
           <div class="avatar"><%= createdBy?.name.slice(0, 1) %></div>
           <div class="shorten-url-box">
             <a
-              href="/<%= shortCode %>"
+              href="/shortUrl/<%= shortCode %>"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <%= host + "/" + shortCode %>
+              <%= host + "/shortUrl/" + shortCode %>
             </a>
             <br />
             <div><%= truncatedUrl %></div>

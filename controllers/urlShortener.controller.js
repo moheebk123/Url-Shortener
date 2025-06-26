@@ -91,7 +91,7 @@ export const redirectToUrl = async (req, res) => {
     const link = await getLink(shortCode);
 
     if (!link)
-      return res.status(404).sendFile(path.join(viewFolderPath, "error.html"));
+      return res.render("error", {message: "Link Not Found"});
 
     return res.redirect(link.url);
   } catch (error) {
@@ -102,7 +102,7 @@ export const redirectToUrl = async (req, res) => {
   }
 };
 
-export const handleEditPage = async (req, res) => {
+export const handleEditUrlShortenerPage = async (req, res) => {
   try {
     const { user } = req;
     if (!user) {
@@ -114,7 +114,7 @@ export const handleEditPage = async (req, res) => {
     const shortenedUrl = await getLinkById(id);
 
     if (shortenedUrl && user.id === shortenedUrl.createdBy.toString()) {
-      return res.render("edit", {
+      return res.render("editUrlShortener", {
         shortenedUrl,
         errors: req.flash("errors"),
         successes: req.flash("successes"),
@@ -134,7 +134,7 @@ export const handleEditPage = async (req, res) => {
   }
 };
 
-export const handleEdit = async (req, res) => {
+export const handleEditUrlShortener = async (req, res) => {
   try {
     const { user } = req;
     if (!user) {
@@ -178,7 +178,7 @@ export const handleEdit = async (req, res) => {
   }
 };
 
-export const handleDelete = async (req, res) => {
+export const handleDeleteUrlShortener = async (req, res) => {
   try {
     const { user } = req;
     if (!user) {

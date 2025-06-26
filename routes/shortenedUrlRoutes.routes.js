@@ -4,9 +4,9 @@ import {
   handleAbout,
   addShortenedUrl,
   redirectToUrl,
-  handleDelete,
-  handleEdit,
-  handleEditPage,
+  handleDeleteUrlShortener,
+  handleEditUrlShortener,
+  handleEditUrlShortenerPage,
 } from "../controllers/urlShortener.controller.js";
 
 const router = Router();
@@ -17,10 +17,13 @@ router.get("/about", handleAbout);
 
 router.post("/", addShortenedUrl);
 
-router.get("/:shortCode", redirectToUrl);
+router.get("/shortUrl/:shortCode", redirectToUrl);
 
-router.route("/edit/:id").get(handleEditPage).post(handleEdit);
+router
+  .route("/edit-shortened-url/:id")
+  .get(handleEditUrlShortenerPage)
+  .post(handleEditUrlShortener);
 
-router.post("/delete/:id", handleDelete);
+router.post("/delete/:id", handleDeleteUrlShortener);
 
 export const shortenedUrlRoutes = router;

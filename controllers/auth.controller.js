@@ -6,6 +6,8 @@ import {
   updateRefreshToken,
   getUserWithLinks,
   updateVerification,
+  updateName,
+  deleteUser,
 } from "../services/user.services.js";
 import {
   hashPassword,
@@ -14,6 +16,7 @@ import {
   generateVerifyCode,
 } from "../services/auth.services.js";
 import { sendVerificationCode } from "../services/email.services.js";
+import { deleteLink, deleteUserLinks } from "../services/links.services.js";
 
 const handleRegister = async (req, res) => {
   try {
@@ -44,7 +47,7 @@ const handleRegister = async (req, res) => {
       password: hashedPassword,
       refreshToken: "",
       isVerified: false,
-      verificationCode: ""
+      verificationCode: "",
     });
     if (user) {
       const accessToken = generateToken(
@@ -207,7 +210,7 @@ const handleResendVerificationLink = async (req, res) => {
 
 const handleVerifyEmail = async (req, res) => {
   const { user, query } = req;
-  console.log(query)
+  console.log(query);
   if (!user) {
     req.flash(
       "errors",
@@ -224,17 +227,77 @@ const handleVerifyEmail = async (req, res) => {
 
   const verificationCode = req.body.verifyCode;
   if (verificationCode === loggedUser.verificationCode) {
-    await updateVerification(loggedUser._id, "", true)
+    await updateVerification(loggedUser._id, "", true);
 
     req.flash("successes", "Email verified successfully");
     return res.redirect("/profile");
   }
-  req.flash(
-    "errors",
-    "Invalid verification code"
-  );
+  req.flash("errors", "Invalid verification code");
   res.redirect("/verify-email");
 };
+
+const handleEditProfile = async (req, res) => {
+  const { user, body } = req;
+  if (!user) {
+    req.flash(
+      "errors",
+      "You are not authenticated to edit profile"
+    );
+    return res.redirect("/login");
+  }
+  const newName = body.name;
+  const oldName = user.name
+
+  if (oldName === newName) {
+    req.flash("errors", "Nothing to edit in profile");
+    res.redirect("/edit-profile");
+  }
+
+  const updatedUser = await updateName(user.id, newName)
+  if (updatedUser) {
+    const accessToken = generateToken(
+      {
+        id: user.id,
+        name: newName,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      "1m"
+    );
+
+    req.flash("successes", "Profile edit successfully");
+    return res
+      .cookie("access_token", accessToken, {
+        httpOnly: true,
+        sameSite: "Strict",
+        secure: false, // true in production
+        maxAge: 15 * 60 * 1000, // 1 min
+      })
+      .redirect("/profile");
+  } else {
+    req.flash("errors", "Failed to edit profile. Try again");
+    res.redirect("/edit-profile");
+  }
+};
+
+const handleDeleteAccount = async (req, res) => {
+  const { user } = req;
+  if (!user) {
+    req.flash("errors", "You are not authenticated to delete this account");
+    return res.redirect("/login");
+  }
+
+  const deletedUser = await deleteUser(user.id)
+  const deletedLinks = await deleteUserLinks(user.id)
+
+  if (deletedUser && deletedLinks) {
+    req.flash("successes", "User account deleted successfully");
+    res.clearCookie("access_token").clearCookie("refresh_token").redirect("/");
+  } else {
+    req.flash("errors", "Failed to delete user account");
+    res.redirect("/profile");
+  }
+}
 
 const handleRegisterPage = (req, res) => {
   return res.render("register", { errors: req.flash("errors") });
@@ -297,7 +360,7 @@ const handleVerifyEmailPage = async (req, res) => {
       const success = await sendVerificationCode(
         loggedUser.email,
         verificationCode
-      )
+      );
 
       if (success) {
         req.flash("successes", "Verification code sent successfully");
@@ -315,7 +378,6 @@ const handleVerifyEmailPage = async (req, res) => {
           successes: req.flash("successes"),
         });
       }
-
     } catch (error) {
       console.log(error);
 
@@ -336,14 +398,36 @@ const handleVerifyEmailPage = async (req, res) => {
   });
 };
 
+const handleEditProfilePage = async (req, res) => {
+  const { user } = req;
+  if (!user) {
+    req.flash(
+      "errors",
+      "You are not authenticated to access verify email page"
+    );
+    return res.redirect("/login");
+  }
+
+  const loggedUser = await getUserById(user.id);
+  if (loggedUser) {
+    return res.render("editProfile", {
+      errors: req.flash("errors"),
+      successes: req.flash("successes"),
+    });
+  }
+};
+
 export {
   handleRegister,
   handleLogin,
   handleLogout,
   handleResendVerificationLink,
   handleVerifyEmail,
+  handleEditProfile,
+  handleDeleteAccount,
   handleRegisterPage,
   handleLoginPage,
   handleProfilePage,
   handleVerifyEmailPage,
+  handleEditProfilePage,
 };

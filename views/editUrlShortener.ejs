@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+    <title>Edit Shortened Url</title>
+  </head>
+  <body>
+    <%- include("layout/header.ejs") %>
+
+
+    <% if (successes && successes.length > 0) { %>
+      <% successes.forEach((success) => { %>
+        <p class="flash-success"><%= success %></p>
+      <% }) %>
+    <% } %>
+
+    <% if (errors && errors.length > 0) { %>
+      <% errors.forEach((error) => { %>
+        <p class="flash-error"><%= error %></p>
+      <% }) %>
+    <% } %>
+
+    <div id="main">
+      <% if (user) { %>
+      <div class="user-login-success">You are logged in</div>
+      <form class="input-box" action="/edit/<%= shortenedUrl._id %>" method="post">
+        <h2 class="heading">Update Shortened Url</h2>
+        <div class="box">
+          <input
+            type="url"
+            name="url"
+            class="url"
+            placeholder="Enter URL"
+            value="<%= shortenedUrl.url %>"
+            required
+          />
+        </div>
+        <div class="box">
+          <input
+            type="text"
+            name="shortCode"
+            class="custom-url"
+            value="<%= shortenedUrl.shortCode %>"
+            placeholder="Enter custom short code (Optional)"
+          />
+        </div>
+        <button type="submit">Update</button>
+        <h3><a href="/profile">Go to Profile</a></h3>
+      </form>
+      <% } else { %>
+      <div class="user-login-warning">You are not-logged in</div>
+      <% } %>
+    </div>
+
+    <script>
+      setTimeout(() => {
+        const successes = document.querySelectorAll(".flash-success");
+        if (successes.length > 0) {
+          successes.forEach((success) => {
+            success.style.display = "none";
+          });
+        }
+
+        const errors = document.querySelectorAll(".flash-error");
+        if (errors.length > 0) {
+          errors.forEach((error) => {
+            error.style.display = "none";
+          });
+        }
+      }, 5000);
+    </script>
+  </body>
+</html>

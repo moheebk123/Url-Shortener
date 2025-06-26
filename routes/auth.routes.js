@@ -1,14 +1,17 @@
 import { Router } from "express";
 import {
-  handleRegister,
-  handleLogin,
   handleRegisterPage,
   handleLoginPage,
   handleProfilePage,
+  handleEditProfilePage,
+  handleRegister,
+  handleLogin,
+  handleEditProfile,
   handleLogout,
   handleVerifyEmailPage,
   handleResendVerificationLink,
-  handleVerifyEmail
+  handleVerifyEmail,
+  handleDeleteAccount
 } from "../controllers/auth.controller.js";
 
 const router = Router();
@@ -25,6 +28,13 @@ router.route("/resend-verification-link").get(handleResendVerificationLink);
 
 router.route("/profile").get(handleProfilePage);
 
+router
+  .route("/edit-profile")
+  .get(handleEditProfilePage)
+  .post(handleEditProfile);
+
 router.route("/logout").get(handleLogout);
+
+router.route("/delete-account").post(handleDeleteAccount);
 
 export const authRoutes = router;

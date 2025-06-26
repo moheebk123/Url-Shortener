@@ -39,9 +39,7 @@ app.use(authRoutes);
 app.use(shortenedUrlRoutes);
 
 app.use((_, res) => {
-  return res
-    .status(404)
-    .sendFile(path.join(import.meta.dirname, "views", "error.html"));
+  return res.render("error", { message: "Page Not Found" });
 });
 
 try {

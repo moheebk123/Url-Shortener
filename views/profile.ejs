@@ -22,6 +22,9 @@
           <h3><%= user.email %></h3>
           <h3><%= since %></h3>
         </div>
+        <button class="logout">
+          <a href="/logout">Logout</a>
+        </button>
       </div>
       <div class="links-overview-box">
         <h2 class="heading">Shortened URLs</h2>
@@ -37,21 +40,24 @@
         <div class="shorten-url">
           <div class="shorten-url-box">
             <a
-              href="/<%= shortCode %>"
+              href="/shortUrl/<%= shortCode %>"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <%= host + "/" + shortCode %>
+              <%= host + "/shortUrl/" + shortCode %>
             </a>
             <br />
             <div><%= truncatedUrl %></div>
           </div>
-          <form action="/delete/<%= _id %>" method="post">
+
+          <div class="action-button">
             <button class="edit">
-              <a href="/edit/<%= _id %>" type="button">Edit</a>
+              <a href="/edit-shortened-url/<%= _id %>" type="button">Edit</a>
             </button>
-            <button class="delete" type="submit">Delete</button>
-          </form>
+            <form action="/delete/<%= _id %>" method="post">
+              <button class="delete" type="submit">Delete</button>
+            </form>
+          </div>
         </div>
         <% }) %>
       </div>
@@ -60,22 +66,41 @@
       <% } %>
       <div class="verification-status">
         Email verification:
-        <div class="user-login-<%= isVerified ? 'success' : 'error'%>"><%= isVerified ? 'Verified' : 'Not Verified'%></div>
-        <% if (!isVerified) { %>
+        <div class="verify-button-box">
+          <div class="user-login-<%= isVerified ? 'success' : 'error'%>">
+            <%= isVerified ? 'Verified' : 'Not Verified'%>
+          </div>
+          <% if (!isVerified) { %>
           <button class="verify"><a href="/verify-email">Verify Now</a></button>
           <% } %>
+        </div>
       </div>
     </div>
     <div class="button-group">
-      <button class="edit">Edit Profile</button>
+      <button class="edit"><a href="/edit-profile">Edit Profile</a></button>
       <button class="edit">Change Password</button>
-      <button class="logout-btn">Logout</button>
+      <button class="delete" onclick="openConfirmationBox()">
+        Delete Account
+      </button>
+    </div>
+    <div class="confirmation-box">
+      <div class="confirm-box">
+        <h2>Are you sure you want to delete your account</h2>
+        <div>
+          <button class="edit" onclick="closeConfirmationBox()">Cancel</button>
+          <form action="/delete-account" method="post">
+            <button class="delete" onclick="closeConfirmationBox()">Delete</button>
+          </form>
+        </div>
+      </div>
     </div>
     <% } else { %>
     <p class="flash-error">You are not authenticated to access profile page</p>
     <% } %>
 
     <script>
+      const confirmation = document.querySelector(".confirmation-box");
+
       setTimeout(() => {
         const successes = document.querySelectorAll(".flash-success");
         if (successes.length > 0) {
@@ -91,6 +116,14 @@
           });
         }
       }, 5000);
+
+      function openConfirmationBox() {
+        confirmation.style.display = "grid";
+      }
+
+      function closeConfirmationBox() {
+        confirmation.style.display = "none";
+      }
     </script>
   </body>
 </html>
