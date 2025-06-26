@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import argon2 from "argon2";
-import jwt from "jsonwebtoken";
 
 const userSchema = mongoose.Schema(
   {
@@ -19,6 +17,8 @@ const userSchema = mongoose.Schema(
       required: [true, "Password is required"],
       unique: true,
     },
+    refreshToken: String,
+    isVerified: Boolean,
     shortenedUrls: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -29,40 +29,4 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("user", userSchema);
-
-export const hashPassword = async (password) => {
-  return await argon2.hash(password);
-};
-
-export const isPasswordCorrect = async (password, hashedPassword) => {
-  return await argon2.verify(hashedPassword, password);
-};
-
-export const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "1m"
-  })
-};
-
-export const verifyToken = (token) => {
-  return jwt.verify(token, process.env.JWT_SECRET)
-}
-
-export const createUser = async (newUser) => {
-  return await User.create(newUser);
-};
-
-export const getUser = async (email) => {
-  return await User.findOne({ email });
-};
-
-export const getUserWithLinks = async (userId) => {
-  return await User.findById(userId).populate("shortenedUrls");
-};
-
-export const pushShortenedUrl = async (userId, newShortUrlId) => {
-  await User.findByIdAndUpdate(userId, {
-    $push: { shortenedUrls: newShortUrlId },
-  });
-}
+export const User = mongoose.model("user", userSchema);

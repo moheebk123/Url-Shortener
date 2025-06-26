@@ -7,15 +7,14 @@ import {
   getLinkById,
   updateLink,
   deleteLink,
-} from "../models/links.model.js";
-import { pushShortenedUrl } from "../models/users.model.js";
+} from "../services/links.services.js";
+import { pushShortenedUrl } from "../services/user.services.js";
 
 const viewFolderPath = path.join(path.dirname(import.meta.dirname), "views");
 
 export const handleRoot = async (req, res) => {
   try {
     const links = await loadLinks();
-    console.log(links[0]._id);
 
     return res.render("index", {
       links,

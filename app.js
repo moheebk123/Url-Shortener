@@ -31,7 +31,6 @@ app.set("views", "./views");
 
 app.use(verifyAuthentication);
 app.use((req, res, next) => {
-  console.log(req.user)
   res.locals.user = req.user;
   return next();
 });
