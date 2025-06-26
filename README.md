@@ -8,7 +8,7 @@ A full-featured URL Shortener application built with **Node.js**, **Express**, a
 - ✂️ Shorten long URLs
 - 📊 Redirect short URLs to original URL
 - 🧑‍💼 User profile to manage and view account
-- 🧑‍💼 User dashboard to manage links
+- 🧑‍💼 User dashboard to manage links and redirection
 - 💾 MongoDB for data persistence
 - 🧩 EJS templating for views
 - ☁️ Cloudinary integration for avatar uploads
@@ -113,6 +113,23 @@ A full-featured URL Shortener application built with **Node.js**, **Express**, a
 ---
 
 ## ✨ Screenshots
+- **Home Page Without Logged In**
+![Home Page Without Logged In](./public/project-image-1.png)
+- **About Page**
+![About Page](./public/project-image-2.png)
+- **All Links Page**
+![All Links Page](./public/project-image-3.png)
+- **Register Page**
+![Register Page](./public/project-image-4.png)
+- **Login Page**
+![Login Page](./public/project-image-5.png)
+- **Profile Page**
+![Profile Page](./public/project-image-6.png)
+- **Home Page With Logged In**
+![Home Page With Logged In](./public/project-image-7.png)
+- **User Links Page**
+![User Links Page](./public/project-image-8.png)
+- **Other Pages Like Edit Shortened Url, Edit Profile Verify Email, Forget Password, Reset Password, Set Password, etc.**
 
 ---
 
