@@ -2,7 +2,7 @@ import multer from "multer";
 import path from "path";
 
 const avatarStorage = multer.diskStorage({
-  destination: (_, _, cb) => {
+  destination: (req, file, cb) => {
     cb(null, "temp");
   },
   filename: (_, file, cb) => {
