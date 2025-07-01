@@ -5,19 +5,15 @@ import { authRoutes } from "./auth.routes.js";
 import { oauthRoutes } from "./oauth.routes.js";
 import { userRoutes } from "./user.routes.js";
 
-import {
-  handleRoot,
-  handleAbout,
-  handleAllLinks,
-} from "../controllers/urlShortener.controller.js";
+import * as pagesController from "../controllers/index.controller.js";
 
 const router = Router();
 
-router.get("/", handleRoot);
+router.get("/", pagesController.handleRoot);
 
-router.get("/about", handleAbout);
+router.get("/about", pagesController.handleAbout);
 
-router.get("/links", handleAllLinks);
+router.get("/links", pagesController.handleAllLinks);
 
 const generalRoutes = router;
 

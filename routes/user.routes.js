@@ -1,39 +1,29 @@
 import { Router } from "express";
 
-import {
-  handleProfilePage,
-  handleEditProfilePage,
-  handleSetPasswordPage,
-  handleChangePasswordPage,
-  handleEditProfile,
-  handleDeleteAccount,
-  handleSetPassword,
-  handleChangePassword,
-  handleUserLinks,
-} from "../controllers/auth.controller.js";
+import * as userControllers from "../controllers/index.controller.js";
 import { avatarUpload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.get("/:userId/links", handleUserLinks);
+router.get("/:userId/links", userControllers.handleUserLinks);
 
-router.route("/profile").get(handleProfilePage);
+router.route("/profile").get(userControllers.handleProfilePage);
 
 router
   .route("/edit-profile")
-  .get(handleEditProfilePage)
-  .post(avatarUpload.single("avatar"), handleEditProfile);
+  .get(userControllers.handleEditProfilePage)
+  .post(avatarUpload.single("avatar"), userControllers.handleEditProfile);
 
 router
   .route("/set-password")
-  .get(handleSetPasswordPage)
-  .post(handleSetPassword);
+  .get(userControllers.handleSetPasswordPage)
+  .post(userControllers.handleSetPassword);
 
 router
   .route("/change-password")
-  .get(handleChangePasswordPage)
-  .post(handleChangePassword);
+  .get(userControllers.handleChangePasswordPage)
+  .post(userControllers.handleChangePassword);
 
-router.route("/delete-account").post(handleDeleteAccount);
+router.route("/delete-account").post(userControllers.handleDeleteAccount);
 
 export const userRoutes = router;
