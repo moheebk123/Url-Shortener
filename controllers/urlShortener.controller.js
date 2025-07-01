@@ -125,6 +125,9 @@ export const redirectToUrl = async (req, res) => {
 
     if (!link) return res.render("error", { message: "Link Not Found" });
 
+    link.redirectionCount = link.redirectionCount + 1;
+    link.save({ validateBeforeSave: false });
+    
     return res.status(301).redirect(link.url);
   } catch (error) {
     console.log(error);
