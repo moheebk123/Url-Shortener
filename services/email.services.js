@@ -1,6 +1,6 @@
 import {
   RESET_PASSWORD_EMAIL_TEMPLATE,
-  VERIFICATION_EMAIL_TEMPLATE
+  VERIFICATION_EMAIL_TEMPLATE,
 } from "../templates/email.template.js";
 import { transporter } from "../utils/index.utils.js";
 
@@ -10,12 +10,15 @@ export const sendVerificationCode = async (email, verificationCode) => {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "URL Shortener, Email Verification",
-      html: VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verificationCode),
+      html: VERIFICATION_EMAIL_TEMPLATE.replace(
+        "{verificationCode}",
+        verificationCode
+      ),
     };
     const success = await transporter.sendMail(mailOptions);
     return success;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return false;
   }
 };

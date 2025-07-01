@@ -13,11 +13,11 @@ export const getUserById = async (userId) => {
 };
 
 export const getUserByResetPasswordToken = async (resetPasswordToken) => {
-  return await User.findOne({resetPasswordToken});
+  return await User.findOne({ resetPasswordToken });
 };
 
 export const getUserWithOAuthProvider = async (email) => {
-  return await User.findOne({email}).populate("oauthUser");
+  return await User.findOne({ email }).populate("oauthUser");
 };
 
 export const pushShortenedUrl = async (userId, newShortUrlId) => {
@@ -32,7 +32,11 @@ export const updateRefreshToken = async (userId, refreshToken = "") => {
   });
 };
 
-export const updateVerification = async (userId, verificationCode, isVerified=false) => {
+export const updateVerification = async (
+  userId,
+  verificationCode,
+  isVerified = false
+) => {
   await User.findByIdAndUpdate(userId, {
     $set: { verificationCode, isVerified },
   });

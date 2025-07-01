@@ -2,11 +2,10 @@ import multer from "multer";
 import path from "path";
 
 const avatarStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // cb(null, "public/uploads");
+  destination: (_, _, cb) => {
     cb(null, "temp");
   },
-  filename: (req, file, cb) => {
+  filename: (_, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, `${Date.now()}_${Math.random()}${ext}`);
   },

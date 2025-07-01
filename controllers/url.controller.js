@@ -47,7 +47,8 @@ export const redirectToUrl = async (req, res) => {
     const { shortCode } = req.params;
     const link = await services.getLink(shortCode);
 
-    if (!link) return res.render("general/error", { message: "Link Not Found" });
+    if (!link)
+      return res.render("general/error", { message: "Link Not Found" });
 
     link.redirectionCount = link.redirectionCount + 1;
     link.save({ validateBeforeSave: false });

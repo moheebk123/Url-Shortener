@@ -1,4 +1,4 @@
-import crypto from "crypto"
+import crypto from "crypto";
 
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
@@ -29,5 +29,5 @@ export const generateVerifyCode = (digit = 8) => {
   const min = 10 ** (digit - 1); // 10000000
   const max = 10 ** digit; // 100000000
 
-  return crypto.randomInt(min, max).toString()
+  return crypto.randomInt(min, max).toString();
 };

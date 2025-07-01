@@ -44,10 +44,8 @@ export {
   generateToken,
   verifyToken,
   generateVerifyCode,
-
   sendVerificationCode,
   sendResetPassword,
-
   loadLinks,
   addLink,
   getLink,
@@ -55,11 +53,9 @@ export {
   updateLink,
   deleteLink,
   deleteUserLinks,
-
   createOAuthUser,
   linkOAuthUser,
   deleteOAuthUser,
-
   createUser,
   getUserByEmail,
   getUserById,
@@ -70,5 +66,5 @@ export {
   updateVerification,
   updateUserProfile,
   updatePassword,
-  deleteUser
+  deleteUser,
 };

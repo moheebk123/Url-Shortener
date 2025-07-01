@@ -3,9 +3,4 @@ import { uploadOnCloudinary } from "./cloud/cloudinary.utils.js";
 import { github } from "./oauth/github.utils.js";
 import { google } from "./oauth/google.utils.js";
 
-export {
-  transporter,
-  uploadOnCloudinary,
-  github,
-  google
-}
+export { transporter, uploadOnCloudinary, github, google };

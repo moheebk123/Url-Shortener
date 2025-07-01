@@ -1,5 +1,5 @@
-import mongoose from "mongoose"
-import { env } from "./env.config.js"
+import mongoose from "mongoose";
+import { env } from "./env.config.js";
 
 export const connectDB = async () => {
   try {
@@ -9,4 +9,4 @@ export const connectDB = async () => {
     console.error(error);
     process.exit();
   }
-}
+};
