@@ -57,7 +57,7 @@ export const handleAllLinks = async (req, res) => {
     const startPage = Math.max(1, page - 1);
     const endPage = Math.min(totalPages, page + 1);
 
-    if (page > totalPages) {
+    if (totalLinks > 0 && page > totalPages) {
       return res.redirect("/links?page=1");
     }
 
