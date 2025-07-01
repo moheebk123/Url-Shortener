@@ -17,7 +17,7 @@
     <div id="main">
       <div class="profile-box">
         <% if (avatar) { %>
-          <img src="<%= avatar %>" alt="<%= user.name %>" class="avatar big">
+          <img src="<%= avatar %>" alt="<%= user.name.slice(0, 1) %>" class="avatar big">
           <% } else { %>
             <div class="avatar big">
             <%= user.name.slice(0, 1) %>
