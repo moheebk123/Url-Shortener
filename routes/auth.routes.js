@@ -1,10 +1,13 @@
 import { Router } from "express";
 import {
   handleRegisterPage,
+  handleVerifyEmailPage,
   handleLoginPage,
   handleResetPasswordPage,
   handleForgetPasswordPage,
   handleRegister,
+  handleVerifyEmail,
+  handleResendVerificationLink,
   handleLogin,
   handleLogout,
   handleResetPassword,
@@ -14,6 +17,13 @@ import {
 const router = Router();
 
 router.route("/register").get(handleRegisterPage).post(handleRegister);
+
+router
+  .route("/verify-email")
+  .get(handleVerifyEmailPage)
+  .post(handleVerifyEmail);
+
+router.route("/resend-verification-link").get(handleResendVerificationLink);
 
 router.route("/login").get(handleLoginPage).post(handleLogin);
 

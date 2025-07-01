@@ -10,7 +10,7 @@ import {
 
 const router = Router();
 
-router.post("/", addShortenedUrl);
+router.post("/add-url", addShortenedUrl);
 
 router.get("/shortUrl/:shortCode", redirectToUrl);
 
@@ -19,6 +19,6 @@ router
   .get(handleEditUrlShortenerPage)
   .post(handleEditUrlShortener);
 
-router.post("/delete/:id", handleDeleteUrlShortener);
+router.post("/delete-shortened-url/:id", handleDeleteUrlShortener);
 
 export const urlRoutes = router;

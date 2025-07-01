@@ -6,10 +6,10 @@
     <a href="/links">Links</a>
     <% if (user) { %>
     <a href="/user/<%= user.id %>/links?page=1">Your Links</a>
-    <a href="/profile">Profile</a>
+    <a href="/user/profile">Profile</a>
     <% } else { %>
-    <a href="/register">Register</a>
-    <a href="/login">Login</a>
+    <a href="/auth/register">Register</a>
+    <a href="/auth/login">Login</a>
     <% } %>
   </div>
   <img src="/assets/icons/menu-open.png" alt="Open" class="open-menu">
@@ -21,10 +21,10 @@
       <a href="/links">Links</a>
       <% if (user) { %>
         <a href="/user/<%= user.id %>/links?page=1">Your Links</a>
-      <a href="/profile">Profile</a>
+      <a href="/user/profile">Profile</a>
       <% } else { %>
-      <a href="/register">Register</a>
-      <a href="/login">Login</a>
+      <a href="/auth/register">Register</a>
+      <a href="/auth/login">Login</a>
       <% } %>
     </div>
   </div>

@@ -44,12 +44,12 @@ app.use((req, res, next) => {
 
 app.use(routes.generalRoutes);
 app.use(routes.urlRoutes);
-app.use(routes.userRoutes);
-app.use(routes.authRoutes);
+app.use("/user", routes.userRoutes);
+app.use("/auth", routes.authRoutes);
 app.use(routes.oauthRoutes);
 
 app.use((_, res) => {
-  return res.render("error", { message: "Page Not Found" });
+  return res.render("general/error", { message: "Page Not Found" });
 });
 
 try {

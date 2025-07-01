@@ -7,7 +7,7 @@
     <title>Login</title>
 </head>
 <body>
-  <%- include("layout/header.ejs") %>
+  <%- include("../layout/header.ejs") %>
 
   <% if (successes && successes.length > 0) { %>
     <% successes.forEach((success) => { %>
@@ -16,12 +16,12 @@
   <% } %>
 
   <div id="main">
-    <form action="/login" class="input-box" method="post">
+    <form action="/auth/login" class="input-box" method="post">
       <h2>Login</h2>
       <div>
         <input type="email" name="email" placeholder="Enter your email" required>
         <input type="password" name="password" placeholder="Enter your password" required>
-        <a href="/reset-password">Forget Password?</a>
+        <a href="/auth/reset-password">Forget Password?</a>
         <br/>
         <br/>
         <button>Login</button>
@@ -33,7 +33,7 @@
             <img src="/assets/logos/github.png" alt="GitHub Icon" class="github">
           </a>
         </div>
-        <h3>Don't have an account <a href="/register">Register</a></h3>
+        <h3>Don't have an account <a href="/auth/register">Register</a></h3>
         <% if (errors && errors.length > 0) { %>
           <% errors.forEach((error) => { %>
             <p class="flash-error"><%= error %></p>

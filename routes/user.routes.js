@@ -6,9 +6,6 @@ import {
   handleSetPasswordPage,
   handleChangePasswordPage,
   handleEditProfile,
-  handleVerifyEmailPage,
-  handleResendVerificationLink,
-  handleVerifyEmail,
   handleDeleteAccount,
   handleSetPassword,
   handleChangePassword,
@@ -18,14 +15,7 @@ import { avatarUpload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router
-  .route("/verify-email")
-  .get(handleVerifyEmailPage)
-  .post(handleVerifyEmail);
-
-router.route("/resend-verification-link").get(handleResendVerificationLink);
-
-router.get("/user/:userId/links", handleUserLinks);
+router.get("/:userId/links", handleUserLinks);
 
 router.route("/profile").get(handleProfilePage);
 
