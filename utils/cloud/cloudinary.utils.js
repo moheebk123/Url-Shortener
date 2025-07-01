@@ -7,7 +7,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
+export const uploadOnCloudinary = async (localFilePath) => {
   try {
     if (!localFilePath) throw new Error("Local file path is required.");
 
@@ -25,5 +25,3 @@ const uploadOnCloudinary = async (localFilePath) => {
     return null;
   }
 };
-
-export default uploadOnCloudinary;

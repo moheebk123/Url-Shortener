@@ -1,9 +1,7 @@
 import { decodeIdToken, generateCodeVerifier, generateState } from "arctic";
 import { loginUserSchema, registerUserSchema } from "../config/auth.config.js";
 import * as services from "../services/index.services.js";
-import { google } from "../utils/oauth/google.utils.js";
-import { github } from "../utils/oauth/github.utils.js";
-import uploadOnCloudinary from "../utils/cloud/cloudinary.utils.js";
+import * as utils from "../utils/index.utils.js";
 
 const handleRegister = async (req, res) => {
   try {
@@ -257,7 +255,7 @@ const handleEditProfile = async (req, res) => {
 
   let avatar = "";
   if (req.file) {
-    const response = await uploadOnCloudinary(req.file.path);
+    const response = await utils.uploadOnCloudinary(req.file.path);
 
     if (!response) {
       req.flash("errors", "Failed to upload avatar image. Try again");
@@ -900,7 +898,7 @@ const handleOAuthRedirect = async (req, res) => {
 
     let url;
     if (provider === "google") {
-      url = google.createAuthorizationURL(state, codeVerifier, [
+      url = utils.google.createAuthorizationURL(state, codeVerifier, [
         "openid",
         "profile",
         "email",
@@ -911,7 +909,7 @@ const handleOAuthRedirect = async (req, res) => {
         .cookie("google_code_verifier", codeVerifier, cookieConfig)
         .redirect(url.toString());
     } else if (provider === "github") {
-      url = github.createAuthorizationURL(state, ["user:email"]);
+      url = utils.github.createAuthorizationURL(state, ["user:email"]);
 
       return res
         .cookie("github_oauth_state", state, cookieConfig)
@@ -964,7 +962,7 @@ const handleOAuthCallback = async (req, res) => {
     let socialAccount = {};
 
     if (provider === "google") {
-      tokens = await google.validateAuthorizationCode(code, codeVerifier);
+      tokens = await utils.google.validateAuthorizationCode(code, codeVerifier);
       const claims = decodeIdToken(tokens.idToken());
       const {
         sub: userId,
@@ -981,7 +979,7 @@ const handleOAuthCallback = async (req, res) => {
         avatar,
       };
     } else if (provider === "github") {
-      tokens = await github.validateAuthorizationCode(code);
+      tokens = await utils.github.validateAuthorizationCode(code);
       const githubUserResponse = await fetch("https://api.github.com/user", {
         headers: {
           Authorization: `Bearer ${tokens.accessToken()}`,
