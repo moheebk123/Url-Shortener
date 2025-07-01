@@ -26,7 +26,7 @@
       <h2 class="heading">Shortened URLs</h2>
       <% if (links && links.length > 0) { %>
       <div class="url-box">
-        <%links.map(({shortCode, url,  _id}) => {%> <% const truncatedUrl =
+        <%links.map(({ _id, url, shortCode, redirectionCount }) => {%> <% const truncatedUrl =
         url.length >= 50 ? `${url.slice(0, 50)}...` : url; %>
         <div class="shorten-url">
           <div class="shorten-url-box">
@@ -39,6 +39,7 @@
             </a>
             <br />
             <div title="<%= url %>"><%= truncatedUrl %></div>
+            <h4>Redirection: <%= redirectionCount %></h4>
           </div>
           <div class="action-button">
             <button class="edit">
