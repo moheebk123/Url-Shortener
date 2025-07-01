@@ -2,60 +2,20 @@ import { Router } from "express";
 import {
   handleRegisterPage,
   handleLoginPage,
-  handleProfilePage,
-  handleEditProfilePage,
-  handleSetPasswordPage,
-  handleChangePasswordPage,
   handleResetPasswordPage,
   handleForgetPasswordPage,
   handleRegister,
   handleLogin,
-  handleEditProfile,
   handleLogout,
-  handleVerifyEmailPage,
-  handleResendVerificationLink,
-  handleVerifyEmail,
-  handleDeleteAccount,
-  handleSetPassword,
-  handleChangePassword,
   handleResetPassword,
   handleForgetPassword,
-  handleUserLinks,
-  handleOAuthRedirect,
-  handleOAuthCallback,
 } from "../controllers/auth.controller.js";
-import { avatarUpload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.get("/register", handleRegisterPage);
+router.route("/register").get(handleRegisterPage).post(handleRegister);
 
-router.post("/register", handleRegister);
-
-router.route("/login").get(handleLoginPage).post(handleLogin)
-
-router.route("/verify-email").get(handleVerifyEmailPage).post(handleVerifyEmail)
-
-router.route("/resend-verification-link").get(handleResendVerificationLink);
-
-router.get("/user/:userId/links", handleUserLinks);
-
-router.route("/profile").get(handleProfilePage);
-
-router
-  .route("/edit-profile")
-  .get(handleEditProfilePage)
-  .post(avatarUpload.single("avatar"), handleEditProfile);
-
-router
-  .route("/set-password")
-  .get(handleSetPasswordPage)
-  .post(handleSetPassword);
-
-router
-  .route("/change-password")
-  .get(handleChangePasswordPage)
-  .post(handleChangePassword);
+router.route("/login").get(handleLoginPage).post(handleLogin);
 
 router
   .route("/reset-password")
@@ -68,11 +28,5 @@ router
   .post(handleForgetPassword);
 
 router.route("/logout").get(handleLogout);
-
-router.route("/delete-account").post(handleDeleteAccount);
-
-router.route("/oauth/:provider").get(handleOAuthRedirect)
-
-router.route("/oauth-redirect/:provider/callback").get(handleOAuthCallback);
 
 export const authRoutes = router;

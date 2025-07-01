@@ -6,8 +6,13 @@ import flash from "connect-flash";
 import cors from "cors";
 import { env } from "./config/env.config.js";
 import { connectDB } from "./config/db-client.config.js";
-import { shortenedUrlRoutes } from "./routes/shortenedUrlRoutes.routes.js";
-import { authRoutes } from "./routes/auth.routes.js";
+import {
+  generalRoutes,
+  urlRoutes,
+  userRoutes,
+  authRoutes,
+  oauthRoutes,
+} from "./routes/index.routes.js";
 import { verifyAuthentication } from "./middlewares/verify.middleware.js";
 
 const app = express();
@@ -43,8 +48,11 @@ app.use((req, res, next) => {
   return next();
 });
 
+app.use(generalRoutes);
+app.use(urlRoutes);
+app.use(userRoutes);
 app.use(authRoutes);
-app.use(shortenedUrlRoutes);
+app.use(oauthRoutes);
 
 app.use((_, res) => {
   return res.render("error", { message: "Page Not Found" });
@@ -52,7 +60,7 @@ app.use((_, res) => {
 
 try {
   await connectDB();
-  app.listen(env.PORT, '0.0.0.0', () => {
+  app.listen(env.PORT, "0.0.0.0", () => {
     console.log(`Server listening on http://localhost:${env.PORT}`);
   });
 } catch (error) {

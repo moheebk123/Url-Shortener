@@ -1,8 +1,6 @@
 import { Router } from "express";
+
 import {
-  handleRoot,
-  handleAbout,
-  handleAllLinks,
   addShortenedUrl,
   redirectToUrl,
   handleDeleteUrlShortener,
@@ -11,12 +9,6 @@ import {
 } from "../controllers/urlShortener.controller.js";
 
 const router = Router();
-
-router.get("/", handleRoot);
-
-router.get("/about", handleAbout);
-
-router.get("/links", handleAllLinks);
 
 router.post("/", addShortenedUrl);
 
@@ -29,4 +21,4 @@ router
 
 router.post("/delete/:id", handleDeleteUrlShortener);
 
-export const shortenedUrlRoutes = router;
+export const urlRoutes = router;
