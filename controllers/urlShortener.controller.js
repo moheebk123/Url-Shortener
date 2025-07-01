@@ -1,21 +1,13 @@
 import crypto from "crypto";
-import {
-  addLink,
-  loadLinks,
-  getLink,
-  getLinkById,
-  updateLink,
-  deleteLink,
-} from "../services/links.services.js";
-import { getUserById, pushShortenedUrl } from "../services/user.services.js";
+import * as services from "../services/index.services.js";
 
 export const handleRoot = async (req, res) => {
   try {
     let isVerified = false;
-    const { links } = await loadLinks({ limit: 5 });
+    const { links } = await services.loadLinks({ limit: 5 });
     const { user } = req;
     if (user) {
-      const loggedUser = await getUserById(user.id);
+      const loggedUser = await services.getUserById(user.id);
 
       if (loggedUser && loggedUser.isVerified) {
         isVerified = true;
@@ -48,7 +40,7 @@ export const handleAllLinks = async (req, res) => {
   }
 
   try {
-    const { links, totalLinks } = await loadLinks({
+    const { links, totalLinks } = await services.loadLinks({
       limit: 10,
       skip: (page - 1) * 10,
     });
@@ -90,21 +82,21 @@ export const addShortenedUrl = async (req, res) => {
       }
 
       const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
-      const link = await getLink(finalShortCode);
+      const link = await services.getLink(finalShortCode);
 
       if (link) {
         req.flash("errors", "Short code already exist.");
         return res.redirect("/");
       }
 
-      const newShortUrl = await addLink({
+      const newShortUrl = await services.addLink({
         shortCode: finalShortCode,
         url,
         createdBy: user.id,
       });
 
       if (newShortUrl) {
-        await pushShortenedUrl(user.id, newShortUrl._id);
+        await services.pushShortenedUrl(user.id, newShortUrl._id);
       }
 
       req.flash("successes", "Short code added successfully.");
@@ -121,13 +113,13 @@ export const addShortenedUrl = async (req, res) => {
 export const redirectToUrl = async (req, res) => {
   try {
     const { shortCode } = req.params;
-    const link = await getLink(shortCode);
+    const link = await services.getLink(shortCode);
 
     if (!link) return res.render("error", { message: "Link Not Found" });
 
     link.redirectionCount = link.redirectionCount + 1;
     link.save({ validateBeforeSave: false });
-    
+
     return res.status(301).redirect(link.url);
   } catch (error) {
     console.log(error);
@@ -146,7 +138,7 @@ export const handleEditUrlShortenerPage = async (req, res) => {
     }
 
     const { id } = req.params;
-    const shortenedUrl = await getLinkById(id);
+    const shortenedUrl = await services.getLinkById(id);
 
     if (shortenedUrl && user.id === shortenedUrl.createdBy.toString()) {
       return res.render("editUrlShortener", {
@@ -178,7 +170,7 @@ export const handleEditUrlShortener = async (req, res) => {
     }
 
     const { id } = req.params;
-    const shortenedUrl = await getLinkById(id);
+    const shortenedUrl = await services.getLinkById(id);
 
     if (shortenedUrl && user.id === shortenedUrl.createdBy.toString()) {
       const { url, shortCode } = req.body;
@@ -190,7 +182,7 @@ export const handleEditUrlShortener = async (req, res) => {
 
       const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
 
-      const updatedShortUrl = await updateLink(shortenedUrl._id, {
+      const updatedShortUrl = await services.updateLink(shortenedUrl._id, {
         url,
         shortCode: finalShortCode,
       });
@@ -223,10 +215,10 @@ export const handleDeleteUrlShortener = async (req, res) => {
     }
 
     const { id } = req.params;
-    const shortenedUrl = await getLinkById(id);
+    const shortenedUrl = await services.getLinkById(id);
 
     if (shortenedUrl && user.id === shortenedUrl.createdBy.toString()) {
-      const deletedShortUrl = await deleteLink(shortenedUrl._id);
+      const deletedShortUrl = await services.deleteLink(shortenedUrl._id);
       if (deletedShortUrl) {
         req.flash("successes", "Shortened Url deleted successfully");
         return res.redirect(`/user/${user.id}/links?page=1`);

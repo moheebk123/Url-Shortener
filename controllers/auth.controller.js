@@ -1,34 +1,6 @@
 import { decodeIdToken, generateCodeVerifier, generateState } from "arctic";
 import { loginUserSchema, registerUserSchema } from "../config/auth.config.js";
-import {
-  createUser,
-  getUserByEmail,
-  getUserById,
-  getUserByResetPasswordToken,
-  updateRefreshToken,
-  updatePassword,
-  updateVerification,
-  deleteUser,
-  getUserWithOAuthProvider,
-  updateUserProfile,
-} from "../services/user.services.js";
-import {
-  hashPassword,
-  generateToken,
-  isPasswordCorrect,
-  generateVerifyCode,
-  verifyToken,
-} from "../services/auth.services.js";
-import {
-  sendResetPassword,
-  sendVerificationCode,
-} from "../services/email.services.js";
-import { deleteUserLinks, loadLinks } from "../services/links.services.js";
-import {
-  createOAuthUser,
-  deleteOAuthUser,
-  linkOAuthUser,
-} from "../services/oauthUsers.services.js";
+import * as services from "../services/index.services.js";
 import { google } from "../utils/oauth/google.utils.js";
 import { github } from "../utils/oauth/github.utils.js";
 import uploadOnCloudinary from "../utils/cloud/cloudinary.utils.js";
@@ -48,15 +20,15 @@ const handleRegister = async (req, res) => {
       return res.redirect("/register");
     }
 
-    const existedUser = await getUserByEmail(email);
+    const existedUser = await services.getUserByEmail(email);
     if (existedUser) {
       req.flash("errors", "User with this credentials already exist.");
       return res.redirect("/register");
     }
 
-    const oauthUser = await createOAuthUser({ provider: "internal" });
+    const oauthUser = await services.createOAuthUser({ provider: "internal" });
 
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await services.hashPassword(password);
 
     const user = await createUser({
       name,
@@ -128,7 +100,7 @@ const handleLogin = async (req, res) => {
       return res.redirect("/login");
     }
 
-    const existedUser = await getUserByEmail(email);
+    const existedUser = await services.getUserByEmail(email);
     if (!existedUser) {
       req.flash("errors", "User doesn't exist.");
       return res.redirect("/login");
@@ -142,7 +114,7 @@ const handleLogin = async (req, res) => {
       return res.redirect("/login");
     }
 
-    const isPasswordValid = await isPasswordCorrect(
+    const isPasswordValid = await services.isPasswordCorrect(
       password,
       existedUser.password
     );
@@ -151,7 +123,7 @@ const handleLogin = async (req, res) => {
       return res.redirect("/login");
     }
 
-    await linkOAuthUser(existedUser.oauthUser, {
+    await services.linkOAuthUser(existedUser.oauthUser, {
       provider: "internal",
       providerAccountId: "internal",
     });
@@ -206,9 +178,9 @@ const handleLogout = async (req, res) => {
     return res.redirect("/");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
   if (loggedUser) {
-    await updateRefreshToken(loggedUser._id);
+    await services.updateRefreshToken(loggedUser._id);
 
     req.flash("successes", "User logout successfully.");
     return res
@@ -228,14 +200,14 @@ const handleResendVerificationLink = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
   if (loggedUser && loggedUser.isVerified) {
     req.flash("errors", "You have already been verified your email");
     return res.redirect("/profile");
   }
 
-  const verificationCode = generateVerifyCode();
-  await updateVerification(loggedUser._id, verificationCode);
+  const verificationCode = services.generateVerifyCode();
+  await services.updateVerification(loggedUser._id, verificationCode);
   req.flash("successes", "Verification code sent successfully");
   return res.redirect("/verify-email");
 };
@@ -251,7 +223,7 @@ const handleVerifyEmail = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
   if (loggedUser && loggedUser.isVerified) {
     req.flash("errors", "You have already been verified your email");
     return res.redirect("/profile");
@@ -259,7 +231,7 @@ const handleVerifyEmail = async (req, res) => {
 
   const verificationCode = body.verifyCode;
   if (verificationCode === loggedUser.verificationCode) {
-    await updateVerification(loggedUser._id, "", true);
+    await services.updateVerification(loggedUser._id, "", true);
 
     req.flash("successes", "Email verified successfully");
     return res.redirect("/profile");
@@ -295,9 +267,13 @@ const handleEditProfile = async (req, res) => {
     avatar = response.url;
   }
 
-  const updatedUser = await updateUserProfile(user.id, newName, avatar);
+  const updatedUser = await services.updateUserProfile(
+    user.id,
+    newName,
+    avatar
+  );
   if (updatedUser) {
-    const accessToken = generateToken(
+    const accessToken = services.generateToken(
       {
         id: user.id,
         name: newName,
@@ -329,11 +305,11 @@ const handleDeleteAccount = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
 
-  const deletedUser = await deleteUser(user.id);
-  const deletedLinks = await deleteUserLinks(user.id);
-  const deletedOAuthUser = await deleteOAuthUser(loggedUser.oauthUser);
+  const deletedUser = await services.deleteUser(user.id);
+  const deletedLinks = await services.deleteUserLinks(user.id);
+  const deletedOAuthUser = await services.deleteOAuthUser(loggedUser.oauthUser);
 
   if (deletedUser && deletedLinks && deletedOAuthUser) {
     req.flash("successes", "User account deleted successfully");
@@ -383,7 +359,7 @@ const handleSetPassword = async (req, res) => {
     return res.redirect("/set-password");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
 
   if (loggedUser) {
     if (loggedUser.password) {
@@ -394,9 +370,12 @@ const handleSetPassword = async (req, res) => {
       return res.redirect("/profile");
     }
 
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await services.hashPassword(password);
     if (hashedPassword) {
-      const updatedUser = await updatePassword(loggedUser._id, hashedPassword);
+      const updatedUser = await services.updatePassword(
+        loggedUser._id,
+        hashedPassword
+      );
       if (updatedUser) {
         req.flash("successes", "Password set successfully");
         return res.redirect("/profile");
@@ -455,10 +434,10 @@ const handleChangePassword = async (req, res) => {
     return res.redirect("/change-password");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
 
   if (loggedUser) {
-    const isPasswordValid = await isPasswordCorrect(
+    const isPasswordValid = await services.isPasswordCorrect(
       oldPassword,
       loggedUser.password
     );
@@ -471,7 +450,10 @@ const handleChangePassword = async (req, res) => {
     const hashedPassword = await hashPassword(newPassword);
 
     if (hashedPassword) {
-      const updatedUser = await updatePassword(loggedUser._id, hashedPassword);
+      const updatedUser = await services.updatePassword(
+        loggedUser._id,
+        hashedPassword
+      );
       if (updatedUser) {
         req.flash("successes", "Password changed successfully");
         return res.redirect("/profile");
@@ -495,9 +477,9 @@ const handleResetPassword = async (req, res) => {
   }
 
   try {
-    const existedUser = await getUserByEmail(email);
+    const existedUser = await services.getUserByEmail(email);
     if (existedUser) {
-      const resetPasswordToken = generateToken(
+      const resetPasswordToken = services.generateToken(
         {
           email: existedUser.email,
         },
@@ -510,7 +492,7 @@ const handleResetPassword = async (req, res) => {
 
       try {
         const resetPasswordLink = `http://${req.host}/forget-password/${resetPasswordToken}`;
-        const success = await sendResetPassword(
+        const success = await services.sendResetPassword(
           existedUser.email,
           resetPasswordLink
         );
@@ -543,11 +525,13 @@ const handleForgetPassword = async (req, res) => {
     const { body, params } = req;
     const { resetPasswordToken } = params;
 
-    const loggedUser = await getUserByResetPasswordToken(resetPasswordToken);
+    const loggedUser = await services.getUserByResetPasswordToken(
+      resetPasswordToken
+    );
 
     if (loggedUser) {
       try {
-        const decodedToken = verifyToken(resetPasswordToken);
+        const decodedToken = services.verifyToken(resetPasswordToken);
 
         if (decodedToken && decodedToken.email === loggedUser.email) {
           const { repeatPassword, newPassword } = body;
@@ -598,10 +582,10 @@ const handleForgetPassword = async (req, res) => {
             );
             return res.redirect(req.url);
           }
-          const hashedPassword = await hashPassword(newPassword);
+          const hashedPassword = await services.hashPassword(newPassword);
 
           if (hashedPassword) {
-            const updatedUser = await updatePassword(
+            const updatedUser = await services.updatePassword(
               loggedUser._id,
               hashedPassword
             );
@@ -648,7 +632,7 @@ const handleUserLinks = async (req, res) => {
   }
 
   try {
-    const { links, totalLinks } = await loadLinks({
+    const { links, totalLinks } = await services.loadLinks({
       limit: 10,
       skip: (page - 1) * 10,
       createdBy: req.user.id,
@@ -710,7 +694,9 @@ const handleProfilePage = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const userWithOAuthProvider = await getUserWithOAuthProvider(user.email);
+  const userWithOAuthProvider = await services.getUserWithOAuthProvider(
+    user.email
+  );
 
   if (userWithOAuthProvider) {
     const date = new Date(userWithOAuthProvider.createdAt);
@@ -757,7 +743,7 @@ const handleVerifyEmailPage = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
   if (loggedUser && loggedUser.isVerified) {
     req.flash("errors", "You have already been verified your email");
     return res.redirect("/profile");
@@ -765,10 +751,10 @@ const handleVerifyEmailPage = async (req, res) => {
 
   if (loggedUser && loggedUser.verificationCode.length === 0) {
     try {
-      const verificationCode = generateVerifyCode();
-      await updateVerification(loggedUser._id, verificationCode);
+      const verificationCode = services.generateVerifyCode();
+      await services.updateVerification(loggedUser._id, verificationCode);
 
-      const success = await sendVerificationCode(
+      const success = await services.sendVerificationCode(
         loggedUser.email,
         verificationCode
       );
@@ -819,7 +805,7 @@ const handleEditProfilePage = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
   if (loggedUser) {
     const { avatar } = loggedUser;
     return res.render("editProfile", {
@@ -840,7 +826,7 @@ const handleSetPasswordPage = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
 
   if (loggedUser) {
     return res.render("setPassword", {
@@ -860,7 +846,7 @@ const handleChangePasswordPage = async (req, res) => {
     return res.redirect("/login");
   }
 
-  const loggedUser = await getUserById(user.id);
+  const loggedUser = await services.getUserById(user.id);
 
   if (loggedUser) {
     return res.render("changePassword", {
@@ -880,7 +866,7 @@ const handleResetPasswordPage = (req, res) => {
 const handleForgetPasswordPage = async (req, res) => {
   const { params } = req;
 
-  const loggedUser = await getUserByResetPasswordToken(
+  const loggedUser = await services.getUserByResetPasswordToken(
     params.resetPasswordToken
   );
 
@@ -1029,15 +1015,15 @@ const handleOAuthCallback = async (req, res) => {
       };
     }
 
-    const user = await getUserWithOAuthProvider(socialAccount.email);
+    const user = await services.getUserWithOAuthProvider(socialAccount.email);
 
     if (user) {
-      await linkOAuthUser(user.oauthUser._id, {
+      await services.linkOAuthUser(user.oauthUser._id, {
         provider,
         providerAccountId: socialAccount.userId,
       });
 
-      const accessToken = generateToken(
+      const accessToken = services.generateToken(
         {
           id: user._id,
           name: user.name,
@@ -1047,7 +1033,7 @@ const handleOAuthCallback = async (req, res) => {
         "1m"
       );
 
-      const refreshToken = generateToken(
+      const refreshToken = services.generateToken(
         {
           id: user._id,
         },
@@ -1079,12 +1065,12 @@ const handleOAuthCallback = async (req, res) => {
         })
         .redirect("/profile");
     } else {
-      const oauthUser = await createOAuthUser({
+      const oauthUser = await services.createOAuthUser({
         provider,
         providerAccountId: socialAccount.userId,
       });
 
-      const newUser = await createUser({
+      const newUser = await services.createUser({
         name: socialAccount.name,
         email: socialAccount.email,
         oauthAvatar: socialAccount.avatar,
@@ -1095,7 +1081,7 @@ const handleOAuthCallback = async (req, res) => {
         oauthUser: oauthUser._id,
       });
 
-      const accessToken = generateToken(
+      const accessToken = services.generateToken(
         {
           id: newUser._id,
           name: newUser.name,
@@ -1105,7 +1091,7 @@ const handleOAuthCallback = async (req, res) => {
         "1m"
       );
 
-      const refreshToken = generateToken(
+      const refreshToken = services.generateToken(
         {
           id: newUser._id,
         },
