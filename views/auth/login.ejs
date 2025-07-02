@@ -21,14 +21,7 @@
         <br/>
         <br/>
         <button>Login</button>
-        <div class="oauth-box">
-          <a href="/oauth/google">
-            <img src="/assets/logos/google.png" alt="Google Icon" class="google">
-          </a>
-          <a href="/oauth/github">
-            <img src="/assets/logos/github.png" alt="GitHub Icon" class="github">
-          </a>
-        </div>
+        <%- include("../partials/oauth.ejs") %>
         <h3>Don't have an account <a href="/auth/register">Register</a></h3>
       </div>
     </form>
