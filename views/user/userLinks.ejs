@@ -18,11 +18,7 @@
     <% }) %> <% } %>
 
     <div id="main">
-      <% if (user) { %>
-      <div class="user-login-success">You are logged in</div>
-      <% } else { %>
-      <div class="user-login-warning">You are not-logged in</div>
-      <% } %>
+      <%- include("../partials/userStatus.ejs") %>
 
       <h2 class="heading">Shortened URLs</h2>
       <% if (links && links.length > 0) { %>
@@ -87,5 +83,7 @@
       <h3>No Shortened Url</h3>
       <% } %>
     </div>
+
+    <script src="/scripts/flashMessages.js"></script>
   </body>
 </html>

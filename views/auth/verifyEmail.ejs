@@ -17,8 +17,9 @@
     <% }) %> <% } %>
 
     <div id="main">
+      <%- include("../partials/userStatus.ejs") %>
+      
       <% if (user) { %>
-      <div class="user-login-success">You are logged in</div>
       <h2 class="heading">Verify Your Email</h2>
       <form class="input-box" action="/auth/resend-verification-link" method="get">
         <div class="box">
@@ -47,8 +48,6 @@
         </div>
         <button type="submit">Verify Code</button>
       </form>
-      <% } else { %>
-      <div class="user-login-warning">You are not-logged in</div>
       <% } %>
     </div>
 
