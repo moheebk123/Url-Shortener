@@ -1,0 +1,10 @@
+<% if (successes && successes.length >0) { %>
+  <% successes.forEach((success) => { %>
+    <p class="flash-success"><%= success %></p>
+  <% }) %>
+<% } %>
+<% if (errors && errors.length > 0) { %>
+  <% errors.forEach((error) => { %>
+    <p class="flash-error"><%= error %></p>
+  <% }) %> 
+<% } %>

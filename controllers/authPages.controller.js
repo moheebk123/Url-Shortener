@@ -7,7 +7,10 @@ export const handleRegisterPage = (req, res) => {
     return res.redirect("/");
   }
 
-  return res.render("auth/register", { errors: req.flash("errors") });
+  return res.render("auth/register", {
+    successes: req.flash("successes"),
+    errors: req.flash("errors"),
+  });
 };
 
 export const handleLoginPage = (req, res) => {
