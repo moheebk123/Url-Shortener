@@ -85,24 +85,9 @@
     <p class="flash-error">You are not authenticated to access profile page</p>
     <% } %>
 
+    <script src="/scripts/flashMessages.js"></script>
     <script>
       const confirmation = document.querySelector(".confirmation-box");
-
-      setTimeout(() => {
-        const successes = document.querySelectorAll(".flash-success");
-        if (successes.length > 0) {
-          successes.forEach((success) => {
-            success.style.display = "none";
-          });
-        }
-
-        const errors = document.querySelectorAll(".flash-error");
-        if (errors.length > 0) {
-          errors.forEach((error) => {
-            error.style.display = "none";
-          });
-        }
-      }, 5000);
 
       function openConfirmationBox() {
         confirmation.style.display = "grid";

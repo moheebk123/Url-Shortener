@@ -66,22 +66,8 @@
       <% } %>
     </div>
 
+    <script src="/scripts/flashMessages.js"></script>
     <script>
-      setTimeout(() => {
-        const successes = document.querySelectorAll(".flash-success");
-        if (successes.length > 0) {
-          successes.forEach((success) => {
-            success.style.display = "none";
-          });
-        }
-
-        const errors = document.querySelectorAll(".flash-error");
-        if (errors.length > 0) {
-          errors.forEach((error) => {
-            error.style.display = "none";
-          });
-        }
-      }, 5000);
 
       const previewImg = document.querySelector("#avatar-preview-img");
       const previewText = document.querySelector("#avatar-preview-text");
