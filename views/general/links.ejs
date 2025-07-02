@@ -14,59 +14,7 @@
       <%- include("../partials/userStatus.ejs") %>
 
       <h2 class="heading">Shortened URLs</h2>
-      <% if (links && links.length > 0) { %>
-      <div class="url-box">
-        <% links.map(({shortCode, url, createdBy}) => {%>
-          <% const truncatedUrl = url.length >= 50 ? `${url.slice(0, 50)}...` : url; %>
-        <div class="shorten-url">
-          <div class="avatar"><%= createdBy?.name.slice(0, 1) %></div>
-          <div class="shorten-url-box">
-            <a
-              href="/shortUrl/<%= shortCode %>"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <%= host + "/shortUrl/" + shortCode %>
-            </a>
-            <br />
-            <div title="<%= url %>"><%= truncatedUrl %></div>
-          </div>
-        </div>
-        <% }) %>
-      </div>
-      <% if (totalPages > 1) { %>
-        <div class="pagination">
-          <% if (currentPage > 1) { %>
-            <a href="/links?page=<%= currentPage - 1 %>">< <span>Previous</span></a>
-          <% } %>
-          <% if (startPage > 1) { %>
-            <a href="/links?page=1">1</a>
-            <% if (startPage > 2) { %>
-              <div>...</div>
-            <% } %>
-          <% } %>
-          <% for (let i = startPage; i <= endPage; i++) { %>
-            <% if (i === currentPage) { %>
-              <span class="current"><%= currentPage %></span>
-            <% } else { %>
-              <a href="/links?page=<%= i %>"><%= i %></a>
-            <% } %>
-
-          <% } %>
-          <% if (endPage < totalPages) { %>
-            <% if (endPage < (totalPages - 1)) { %>
-              <div>...</div>
-            <% } %>
-            <a href="/links?page=<%= totalPages %>"><%= totalPages %></a>
-          <% } %>
-          <% if (currentPage < totalPages) { %>
-            <a href="/links?page=<%= currentPage + 1 %>"><span>Next</span> ></a>
-          <% } %>
-        </div>
-      <% } %>
-      <% } else { %>
-      <h3>No Shortened Url</h3>
-      <% } %>
+      <%- include("../partials/links.ejs") %>
     </div>
   </body>
 </html>

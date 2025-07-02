@@ -19,6 +19,10 @@ export const handleRoot = async (req, res) => {
       errors: req.flash("errors"),
       successes: req.flash("successes"),
       isVerified,
+      homePage: true,
+      userLinksPage: false,
+      linksPage: false,
+      totalPages: 0,
     });
   } catch (error) {
     console.log(error);
@@ -59,6 +63,9 @@ export const handleAllLinks = async (req, res) => {
       startPage,
       endPage,
       currentPage: page,
+      userLinksPage: false,
+      homePage: false,
+      linksPage: true,
     });
   } catch (error) {
     console.log(error);

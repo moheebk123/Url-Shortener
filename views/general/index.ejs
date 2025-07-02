@@ -13,7 +13,7 @@
 
     <div id="main">
       <%- include("../partials/userStatus.ejs") %>
-      
+
       <% if (isVerified) { %>
       <form class="input-box" action="/add-url" method="post">
         <h2 class="heading">URL Shortener</h2>
@@ -39,32 +39,7 @@
       <% } %>
 
       <h2 class="heading">Shortened URLs</h2>
-      <% if (links && links.length > 0) { %>
-      <div class="url-box">
-        <%links.map(({shortCode, url, createdBy}) => {%> <% const truncatedUrl =
-        url.length >= 50 ? `${url.slice(0, 50)}...` : url; %>
-        <div class="shorten-url">
-          <div class="avatar"><%= createdBy?.name.slice(0, 1) %></div>
-          <div class="shorten-url-box">
-            <a
-              href="/shortUrl/<%= shortCode %>"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <%= host + "/shortUrl/" + shortCode %>
-            </a>
-            <br />
-            <div title="<%= url %>"><%= truncatedUrl %></div>
-          </div>
-        </div>
-        <% }) %>
-        <div class="pagination">
-          <a href="/links?page=1">See all shortened urls</a>
-        </div>
-      </div>
-      <% } else { %>
-      <h3>No Shortened Url</h3>
-      <% } %>
+      <%- include("../partials/links.ejs") %>
     </div>
 
     <script src="/scripts/flashMessages.js"></script>

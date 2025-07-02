@@ -36,6 +36,9 @@ export const handleUserLinks = async (req, res) => {
       startPage,
       endPage,
       currentPage: page,
+      userLinksPage: true,
+      linksPage: true,
+      homePage: false,
     });
   } catch (error) {
     console.log(error);
