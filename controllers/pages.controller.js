@@ -21,7 +21,6 @@ export const handleRoot = async (req, res) => {
       isVerified,
       homePage: true,
       userLinksPage: false,
-      linksPage: false,
       totalPages: 0,
     });
   } catch (error) {
@@ -65,7 +64,6 @@ export const handleAllLinks = async (req, res) => {
       currentPage: page,
       userLinksPage: false,
       homePage: false,
-      linksPage: true,
     });
   } catch (error) {
     console.log(error);

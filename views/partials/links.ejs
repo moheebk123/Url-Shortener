@@ -30,7 +30,12 @@
     <% }) %>
   </div>
 
-  <% if ((linksPage || userLinksPage) && totalPages > 1) { %>
+  <% if (homePage) { %>
+
+    <div class="pagination">
+      <a href="/links?page=1">See all shortened urls</a>
+    </div>
+  <% } else if (totalPages > 1) { %>
     <div class="pagination">
       <% if (currentPage > 1) { %>
         <a href="/user/<%= user.id %>/links?page=<%= currentPage - 1 %>">< <span>Previous</span></a>
@@ -47,7 +52,6 @@
         <% } else { %>
           <a href="/user/<%= user.id %>/links?page=<%= i %>"><%= i %></a>
         <% } %>
-
       <% } %>
       <% if (endPage < totalPages) { %>
         <% if (endPage < (totalPages - 1)) { %>
@@ -58,10 +62,6 @@
       <% if (currentPage < totalPages) { %>
         <a href="/user/<%= user.id %>/links?page=<%= currentPage + 1 %>"><span>Next</span> ></a>
       <% } %>
-    </div>
-  <% } else if (homePage) { %>
-    <div class="pagination">
-      <a href="/links?page=1">See all shortened urls</a>
     </div>
   <% } %>
 <% } else { %>
