@@ -26,7 +26,7 @@ export const handleRegister = async (req, res) => {
 
     const hashedPassword = await services.hashPassword(password);
 
-    const user = await createUser({
+    const user = await services.createUser({
       name,
       email,
       password: hashedPassword,
@@ -37,7 +37,7 @@ export const handleRegister = async (req, res) => {
       oauthUser: oauthUser._id,
     });
     if (user) {
-      const accessToken = generateToken(
+      const accessToken = services.generateToken(
         {
           id: user.id,
           name: user.name,
@@ -47,7 +47,7 @@ export const handleRegister = async (req, res) => {
         "1m"
       );
 
-      const refreshToken = generateToken(
+      const refreshToken = services.generateToken(
         {
           id: user.id,
         },
@@ -72,7 +72,7 @@ export const handleRegister = async (req, res) => {
           secure: true, // true in production
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
-        .redirect("/verify-email");
+        .redirect("/auth/verify-email");
     }
   } catch (error) {
     console.log(error);
